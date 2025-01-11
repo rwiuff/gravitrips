@@ -1,14 +1,13 @@
 package dk.dtu.gravitrips.server;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Game {
 
     private int[][] field;
     private int n;
     private int m;
-    private List<Move> moves = new ArrayList();
+    private ArrayList<Move> moves = new ArrayList<Move>();
 
     public Game(int n, int m) {
         this.n = n;
@@ -43,16 +42,94 @@ public class Game {
         }
     }
 
-    public void checkState() {
-        Move latestMove = moves.getLast();
+    public boolean checkState() {
+        Move latestMove = moves.get(moves.size() - 1);
         int player = latestMove.getPlayer();
         int row = latestMove.getRow();
         int column = latestMove.getColumn();
-        int connectFour = connected(player, row, column);
+        if (connectedUp(player, row, column) >= 4) {
+            return true;
+        } else if (connectedDown(player, row, column) >= 4) {
+            return true;
+        } else if (connectedLeft(player, row, column) >= 4) {
+            return true;
+        } else if (connectedRight(player, row, column) >= 4) {
+            return true;
+        } else if (connectedUpLeft(player, row, column) >= 4) {
+            return true;
+        } else if (connectedUpRight(player, row, column) >= 4) {
+            return true;
+        } else if (connectedDownLeft(player, row, column) >= 4) {
+            return true;
+        } else if (connectedDownRight(player, row, column) >= 4) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private int connected(int player, int row, int column) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'connected'");
+    private int connectedDownRight(int player, int row, int column) {
+        if (field[row + 1][column+1] == player) {
+            return 1 + connectedDownRight(player, row - 1, column);
+        } else {
+            return 1;
+        }
     }
+
+    private int connectedDownLeft(int player, int row, int column) {
+        if (field[row + 1][column-1] == player) {
+            return 1 + connectedDownLeft(player, row - 1, column);
+        } else {
+            return 1;
+        }
+    }
+
+    private int connectedUpRight(int player, int row, int column) {
+        if (field[row - 1][column+1] == player) {
+            return 1 + connectedUpRight(player, row - 1, column);
+        } else {
+            return 1;
+        }
+    }
+
+    private int connectedUpLeft(int player, int row, int column) {
+        if (field[row-1][column-1] == player) {
+            return 1 + connectedUpLeft(player, row - 1, column);
+        } else {
+            return 1;
+        }
+    }
+
+    private int connectedRight(int player, int row, int column) {
+        if (field[row][column+1] == player) {
+            return 1 + connectedRight(player, row - 1, column);
+        } else {
+            return 1;
+        }
+    }
+
+    private int connectedLeft(int player, int row, int column) {
+        if (field[row][column-1] == player) {
+            return 1 + connectedLeft(player, row - 1, column);
+        } else {
+            return 1;
+        }
+    }
+
+    private int connectedDown(int player, int row, int column) {
+        if (field[row + 1][column] == player) {
+            return 1 + connectedDown(player, row - 1, column);
+        } else {
+            return 1;
+        }
+    }
+
+    private int connectedUp(int player, int row, int column) {
+        if (field[row - 1][column] == player) {
+            return 1 + connectedUp(player, row - 1, column);
+        } else {
+            return 1;
+        }
+    }
+
 }
