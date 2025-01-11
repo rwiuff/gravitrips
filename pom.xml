@@ -50,7 +50,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>dk.dtu.gravitrips.TestJSpaceFX</mainClass>
+                            <mainClass>dk.dtu.gravitrips.client.Client</mainClass>
                         </configuration>
                     </execution>
                 </executions>
