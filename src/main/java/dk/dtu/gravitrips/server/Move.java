@@ -5,7 +5,7 @@ public class Move {
     private int row;
     private int column;
 
-    public Move(int player, int column, int row) {
+    public Move(int player, int row, int column) {
         this.player = player;
         this.row = row;
         this.column = column;

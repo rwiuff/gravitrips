@@ -25,6 +25,9 @@ public class Driver {
             game.putPiece(1, 3);
             printGameState();
             System.out.println(game.checkState());
+            game.putPiece(1, 3);
+            printGameState();
+            System.out.println(game.checkState());
         } catch (Exception e) {
             e.printStackTrace();
         }
