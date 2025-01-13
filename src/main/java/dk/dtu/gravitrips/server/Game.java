@@ -4,42 +4,24 @@ import java.util.ArrayList;
 
 public class Game {
 
-    private int[][] field;
-    private int n;
-    private int m;
+    private Field field;
+    private int rows;
+    private int columns;
     private ArrayList<Move> moves = new ArrayList<Move>();
 
-    public Game(int n, int m) {
-        this.n = n+1;
-        this.m = m+1;
-        this.field = new int[n+1][m+1];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                this.field[i][j] = 0;
-            }
-        }
+    public Game(int rows, int columns) {
+        this.rows = rows;
+        this.columns = columns;
+        this.field = new Field(rows, columns);
     }
 
     public int[][] getField() {
-        return field;
+        return field.getField();
     }
 
     public void putPiece(int player, int column) throws Exception {
-        if (column >= m) {
-            throw new IndexOutOfBoundsException(column);
-        } else if (field[1][column] != 0) {
-            throw new Exception("Column is occupied");
-        } else if (field[n - 1][column] == 0) {
-            field[n - 1][column] = player;
-            moves.add(new Move(player, n - 1, column));
-        } else {
-            for (int k = 0; k < n - 1; k++) {
-                if (field[k + 1][column] != 0) {
-                    field[k][column] = player;
-                    moves.add(new Move(player, k, column));
-                }
-            }
-        }
+        Move lastMove = field.dropPiece(player, column);
+        moves.add(lastMove);
     }
 
     public boolean checkState() {
@@ -60,35 +42,35 @@ public class Game {
         int points = 1;
         switch (direction) {
             case 0:
-                if (field[row - 1][column - 1] == player)
+                if (field.lookUp(row - 1, column - 1) == player)
                     points += connected(direction, player, row - 1, column - 1);
                 break;
             case 1:
-                if (field[row - 1][column] == player)
+                if (field.lookUp(row - 1, column) == player)
                     points += connected(direction, player, row - 1, column);
                 break;
             case 2:
-                if (field[row - 1][column + 1] == player)
+                if (field.lookUp(row - 1, column + 1) == player)
                     points += connected(direction, player, row - 1, column + 1);
                 break;
             case 3:
-                if (field[row][column - 1] == player)
+                if (field.lookUp(row, column - 1) == player)
                     points += connected(direction, player, row, column - 1);
                 break;
             case 4:
-                if (field[row][column + 1] == player)
+                if (field.lookUp(row, column + 1) == player)
                     points += connected(direction, player, row, column + 1);
                 break;
             case 5:
-                if (field[row + 1][column - 1] == player)
+                if (field.lookUp(row + 1, column - 1) == player)
                     points += connected(direction, player, row + 1, column - 1);
                 break;
             case 6:
-                if (field[row + 1][column] == player)
+                if (field.lookUp(row + 1, column) == player)
                     points += connected(direction, player, row + 1, column);
                 break;
             case 7:
-                if (field[row + 1][column + 1] == player)
+                if (field.lookUp(row + 1, column + 1) == player)
                     points += connected(direction, player, row + 1, column + 1);
                 break;
             default:

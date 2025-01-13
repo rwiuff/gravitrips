@@ -11,23 +11,20 @@ public class Driver {
         game = new Game(n, m);
         printGameState();
         try {
+            game.putPiece(2, 1);
+            game.putPiece(2, 2);
+            game.putPiece(2, 2);
+            game.putPiece(1, 0);
+            game.putPiece(1, 1);
+            game.putPiece(1, 2);
             game.putPiece(2, 3);
+            game.putPiece(1, 3);
+            game.putPiece(1, 3);
+            System.out.println(game.checkState());
             printGameState();
             game.putPiece(1, 3);
-            printGameState();
             System.out.println(game.checkState());
-            game.putPiece(1, 3);
             printGameState();
-            System.out.println(game.checkState());
-            game.putPiece(1, 3);
-            printGameState();
-            System.out.println(game.checkState());
-            game.putPiece(1, 3);
-            printGameState();
-            System.out.println(game.checkState());
-            game.putPiece(1, 3);
-            printGameState();
-            System.out.println(game.checkState());
         } catch (Exception e) {
             e.printStackTrace();
         }
