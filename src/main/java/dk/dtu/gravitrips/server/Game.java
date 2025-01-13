@@ -5,13 +5,9 @@ import java.util.ArrayList;
 public class Game {
 
     private Field field;
-    private int rows;
-    private int columns;
     private ArrayList<Move> moves = new ArrayList<Move>();
 
     public Game(int rows, int columns) {
-        this.rows = rows;
-        this.columns = columns;
         this.field = new Field(rows, columns);
     }
 
@@ -77,6 +73,10 @@ public class Game {
                 break;
         }
         return points;
+    }
+
+    public Move getLastMove() {
+        return moves.get(moves.size() - 1);
     }
 
 }

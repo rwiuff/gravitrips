@@ -25,6 +25,7 @@ public class Driver {
             game.putPiece(1, 3);
             System.out.println(game.checkState());
             printGameState();
+            System.out.println("Won by player " + game.getLastMove().getPlayer());
         } catch (Exception e) {
             e.printStackTrace();
         }
