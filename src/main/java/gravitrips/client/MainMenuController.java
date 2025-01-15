@@ -14,6 +14,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -30,16 +32,38 @@ public class MainMenuController {
     Button exitBtn;
 
     @FXML
-    private void startGame(ActionEvent event) throws IOException {
+    private void begin(ActionEvent event) throws IOException {
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
-        // Client.startGame(stage); // Startgame -> starGame method
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.initOwner(stage);
+        alert.setTitle("Gravitrips");
+        alert.setHeaderText("Connect or host?");
+        alert.setContentText("Chose an option");
+
+        ButtonType connect = new ButtonType("Connect");
+        ButtonType host = new ButtonType("Host");
+        ButtonType cancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(connect,host,cancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if(result.get()==connect){
+            System.out.println("Connect");
+        } else if(result.get()==host){
+            System.out.println("Host");
+        } else {
+            System.out.println("Cancel");
+        }
     }
 
     @FXML
     private void settingsGoto(ActionEvent event) { // Press on settings
         Settings settings = Client.getSettings(); // Get settings from Client class
         Dialog<HashMap<String, String>> dialog = new Dialog<>(); // Create dialog
+        Node node = (Node) event.getSource();
+        Stage stage = (Stage) node.getScene().getWindow();
+        dialog.initOwner(stage);
         dialog.setTitle("Settings");
         dialog.setHeaderText("Settings for Gravitrips");
         dialog.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/icons/icon32.png"))));

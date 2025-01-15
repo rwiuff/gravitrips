@@ -47,6 +47,7 @@ public class Client extends Application {
 
     static void exit(Stage primaryStage) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.initOwner(primaryStage);
         alert.setContentText("Are you sure you want to exit Gravitrips?");
         alert.setHeaderText("You are about to exit Gravitrips");
         alert.setTitle("Exit Gravitrips");
