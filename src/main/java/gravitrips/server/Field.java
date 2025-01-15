@@ -1,4 +1,4 @@
-package dk.dtu.gravitrips.server;
+package gravitrips.server;
 
 public class Field {
     private int rows;

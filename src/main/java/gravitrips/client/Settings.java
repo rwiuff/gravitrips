@@ -1,4 +1,4 @@
-package dk.dtu.gravitrips.client;
+package gravitrips.client;
 
 public class Settings {
     private String host;

@@ -1,4 +1,4 @@
-package dk.dtu.gravitrips.server;
+package gravitrips.server;
 
 import java.util.Arrays;
 

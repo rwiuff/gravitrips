@@ -1,4 +1,4 @@
-package dk.dtu.gravitrips.client;
+package gravitrips.client;
 
 import java.io.IOException;
 
@@ -65,9 +65,9 @@ public class Client extends Application {
     private void populateResources() throws IOException {
         menuLoader = new FXMLLoader(getClass().getResource("/fxml/MainMenu.fxml"));
         mainMenuRoot = menuLoader.load();
-        icon16 = new Image(getClass().getResourceAsStream("icons/icon16.png"));
-        icon32 = new Image(getClass().getResourceAsStream("icons/icon32.png"));
-        icon64 = new Image(getClass().getResourceAsStream("icons/icon64.png"));
+        icon16 = new Image(getClass().getResourceAsStream("/icons/icon16.png"));
+        icon32 = new Image(getClass().getResourceAsStream("/icons/icon32.png"));
+        icon64 = new Image(getClass().getResourceAsStream("/icons/icon64.png"));
     }
 
     public static Settings getSettings() {

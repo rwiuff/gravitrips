@@ -1,4 +1,4 @@
-package dk.dtu.gravitrips.client;
+package gravitrips.client;
 
 import java.io.IOException;
 import java.util.HashMap;

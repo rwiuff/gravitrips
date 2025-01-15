@@ -1,4 +1,4 @@
-package dk.dtu.gravitrips.server;
+package gravitrips.server;
 
 public class Server {
     public static void main(String[] args) {
