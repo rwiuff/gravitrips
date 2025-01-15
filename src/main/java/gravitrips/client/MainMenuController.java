@@ -45,13 +45,13 @@ public class MainMenuController {
         ButtonType host = new ButtonType("Host");
         ButtonType cancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
-        alert.getButtonTypes().setAll(connect,host,cancel);
+        alert.getButtonTypes().setAll(connect, host, cancel);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if(result.get()==connect){
-            System.out.println("Connect");
-        } else if(result.get()==host){
-            System.out.println("Host");
+        if (result.get() == connect) {
+            Client.connect(stage);
+        } else if (result.get() == host) {
+            Client.host(stage);
         } else {
             System.out.println("Cancel");
         }
@@ -99,7 +99,7 @@ public class MainMenuController {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == applyBtn) {
                 HashMap<String, String> newSettings = new HashMap<String, String>();
-                newSettings.put("rows",  rows.getText());
+                newSettings.put("rows", rows.getText());
                 newSettings.put("columns", columns.getText());
                 newSettings.put("host", host.getText());
                 newSettings.put("port", port.getText());
@@ -110,30 +110,30 @@ public class MainMenuController {
         Optional<HashMap<String, String>> result = dialog.showAndWait();
 
         result.ifPresent(newSettings -> {
-            if (!newSettings.get("rows").isBlank()){
+            if (!newSettings.get("rows").isBlank()) {
                 int newRows = Integer.parseInt(newSettings.get("rows"));
-                if(newRows >= 6 && newRows <= 20){
+                if (newRows >= 6 && newRows <= 20) {
                     settings.setRows(newRows);
                 } else {
                     settings.setRows(6);
                 }
             }
-            if (!newSettings.get("columns").isBlank()){
+            if (!newSettings.get("columns").isBlank()) {
                 int newColumns = Integer.parseInt(newSettings.get("columns"));
-                if(newColumns >= 6 && newColumns <= 20){
+                if (newColumns >= 6 && newColumns <= 20) {
                     settings.setColumns(newColumns);
                 } else {
                     settings.setColumns(6);
                 }
             }
-            if(!newSettings.get("host").isBlank()){
+            if (!newSettings.get("host").isBlank()) {
                 settings.setHost(newSettings.get("host"));
-            }else {
+            } else {
                 settings.setHost("localhost");
             }
-            if(!newSettings.get("port").isBlank()){
+            if (!newSettings.get("port").isBlank()) {
                 settings.setPort(newSettings.get("port"));
-            }else{
+            } else {
                 settings.setPort("31415");
             }
             Client.setSettings(settings);

@@ -20,8 +20,11 @@ public class Client extends Application {
     private Parent mainMenuRoot;
     private Image icon16;
     private static Image icon32;
+    private static FXMLLoader lobbyLoader;
+    private static Parent lobbyRoot;
+    private static LobbyController lobbyController;
     private Image icon64;
-    private Scene scene;
+    private static Scene scene;
 
     public static void main(String[] args) {
         settings = new Settings();
@@ -78,4 +81,29 @@ public class Client extends Application {
     public static void setSettings(Settings settings) {
         Client.settings = settings;
     }
+
+    public static void connect(Stage stage) {
+        System.out.println("connect");
+    }
+
+    public static void host(Stage stage) throws IOException {
+        System.out.println("host");
+        startLobby(stage);
+    }
+
+    private static void startLobby(Stage stage) throws IOException {
+        loadLobby();
+        scene.setRoot(lobbyRoot);
+        lobbyController.setup(settings);
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.centerOnScreen();
+    }
+
+    private static void loadLobby() throws IOException {
+        lobbyLoader = new FXMLLoader(Client.class.getResource("/fxml/Lobby.fxml"));
+        lobbyRoot = lobbyLoader.load();
+        lobbyController = lobbyLoader.getController();
+    }
+
 }
