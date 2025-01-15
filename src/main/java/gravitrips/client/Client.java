@@ -1,7 +1,9 @@
 package gravitrips.client;
 
 import java.io.IOException;
+import java.util.Optional;
 
+import gravitrips.server.Server;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,6 +28,7 @@ public class Client extends Application {
     private static LobbyController lobbyController;
     private Image icon64;
     private static Scene scene;
+    private static Server server;
 
     public static void main(String[] args) {
         settings = new Settings();
@@ -88,13 +92,21 @@ public class Client extends Application {
 
     public static void host(Stage stage) throws IOException {
         System.out.println("host");
+        Client.server = new Server(settings);
         startLobby(stage);
     }
 
     private static void startLobby(Stage stage) throws IOException {
+        TextInputDialog dialog = new TextInputDialog("Username");
+        dialog.initOwner(stage);
+        dialog.setTitle("Gravitrips");
+        dialog.setHeaderText("Chose your username");
+        dialog.setContentText("Input name");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(userName -> Client.settings.setUserName(userName));
         loadLobby();
-        scene.setRoot(lobbyRoot);
         lobbyController.setup(settings);
+        scene.setRoot(lobbyRoot);
         stage.setScene(scene);
         stage.sizeToScene();
         stage.centerOnScreen();

@@ -5,6 +5,7 @@ public class Settings {
     private String port;
     private int columns;
     private int rows;
+    private String userName;
 
     public Settings() {
         this.host = "localhost";
@@ -43,5 +44,13 @@ public class Settings {
 
     public void setRows(int rows) {
         this.rows = rows;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
