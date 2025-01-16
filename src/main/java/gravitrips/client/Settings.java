@@ -10,8 +10,8 @@ public class Settings {
     public Settings() {
         this.host = "localhost";
         this.port = "31415";
-        this.columns = 6;
-        this.rows = 6;
+        this.columns = 16;
+        this.rows = 16;
     }
 
     public String getHost() {

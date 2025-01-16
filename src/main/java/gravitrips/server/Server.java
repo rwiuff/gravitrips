@@ -34,6 +34,7 @@ public class Server implements Runnable {
         this.games = new SequentialSpace();
         this.globalChat = new SequentialSpace();
         repository.add("global_chat", globalChat);
+        new Thread(new ChatHandler(globalChat)).start();
     }
 
     @Override
@@ -98,6 +99,32 @@ class gameHandler implements Runnable {
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+}
+
+class ChatHandler implements Runnable {
+    private SequentialSpace globalChat;
+    private int inc;
+
+    public ChatHandler(SequentialSpace globalChat) throws InterruptedException {
+        this.globalChat = globalChat;
+        globalChat.put(0);
+        this.inc = 0;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Object[] message = globalChat.get(new FormalField(String.class), new FormalField(String.class));
+                inc++;
+                globalChat.put(inc, message[0], message[1]);
+                globalChat.put(inc);
+                globalChat.get(new ActualField(inc - 1));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
