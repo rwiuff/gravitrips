@@ -32,7 +32,7 @@ public class MainMenuController {
     Button exitBtn;
 
     @FXML
-    private void begin(ActionEvent event) throws IOException {
+    private void begin(ActionEvent event) throws IOException, InterruptedException {
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
         Alert alert = new Alert(AlertType.CONFIRMATION);

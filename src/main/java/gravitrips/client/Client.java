@@ -61,6 +61,7 @@ public class Client extends Application {
         alert.setGraphic(new ImageView(icon32));
         if (alert.showAndWait().get() == ButtonType.OK)
             Platform.exit();
+            System.exit(0);
     }
 
     private void mainMenu(Stage primaryStage) {
@@ -86,17 +87,18 @@ public class Client extends Application {
         Client.settings = settings;
     }
 
-    public static void connect(Stage stage) {
+    public static void connect(Stage stage) throws IOException, InterruptedException {
+        startLobby(stage);
         System.out.println("connect");
     }
 
-    public static void host(Stage stage) throws IOException {
+    public static void host(Stage stage) throws IOException, InterruptedException {
         System.out.println("host");
         Client.server = new Server(settings);
         startLobby(stage);
     }
 
-    private static void startLobby(Stage stage) throws IOException {
+    private static void startLobby(Stage stage) throws IOException, InterruptedException {
         TextInputDialog dialog = new TextInputDialog("Username");
         dialog.initOwner(stage);
         dialog.setTitle("Gravitrips");
