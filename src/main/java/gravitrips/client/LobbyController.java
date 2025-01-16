@@ -18,8 +18,8 @@ public class LobbyController {
     }
 
     @FXML
-    private void refresh(ActionEvent event){
-        System.out.println("Refresh");
+    private void ready(ActionEvent event){
+        System.out.println("Ready");
     }
 
     @FXML
