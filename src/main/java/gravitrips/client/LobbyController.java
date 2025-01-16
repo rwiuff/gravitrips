@@ -18,13 +18,13 @@ public class LobbyController {
     }
 
     @FXML
-    private void ready(ActionEvent event){
-        System.out.println("Ready");
+    private void create(ActionEvent event){
+        System.out.println("create");
     }
 
     @FXML
-    private void connect(ActionEvent event){
-        System.out.println("Connect");
+    private void join(ActionEvent event){
+        System.out.println("join");
     }
 
     @FXML
