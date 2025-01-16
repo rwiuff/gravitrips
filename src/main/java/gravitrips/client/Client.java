@@ -89,11 +89,11 @@ public class Client extends Application {
 
     public static void connect(Stage stage) throws IOException, InterruptedException {
         startLobby(stage);
-        System.out.println("connect");
     }
 
     public static void host(Stage stage) throws IOException, InterruptedException {
-        System.out.println("host");
+        Thread serverThread = new Thread(new Server(settings));
+        serverThread.start();
         Client.server = new Server(settings);
         startLobby(stage);
     }

@@ -8,12 +8,16 @@ import org.jspace.SpaceRepository;
 
 import gravitrips.client.Settings;
 
-public class Server {
+public class Server implements Runnable {
     private Settings settings;
     private String host;
     private String port;
     private int rows;
     private int columns;
+    private SequentialSpace lobby;
+    private SequentialSpace games;
+    private SequentialSpace globalChat;
+    private SpaceRepository repository;
 
     public Server(Settings settings) throws InterruptedException {
         this.settings = settings;
@@ -21,48 +25,19 @@ public class Server {
         this.port = settings.getPort();
         this.rows = settings.getRows();
         this.columns = settings.getColumns();
-        SpaceRepository repository = new SpaceRepository();
-
-        SequentialSpace lobby = new SequentialSpace();
-
+        this.repository = new SpaceRepository();
+        this.lobby = new SequentialSpace();
         repository.add("lobby", lobby);
-
         String uri = "tcp://" + host + ":" + port + "/lobby?keep";
-
         repository.addGate(uri);
-
         System.out.println("Opening repository gate at " + uri + "...");
-
-        SequentialSpace games = new SequentialSpace();
-
-        SequentialSpace globalChat = new SequentialSpace();
-
+        this.games = new SequentialSpace();
+        this.globalChat = new SequentialSpace();
         repository.add("global_chat", globalChat);
-
-        new Thread(new LobbyHandler(host, port, repository, lobby, games));
-    }
-}
-
-class LobbyHandler implements Runnable {
-
-    private String host;
-    private String port;
-    private SpaceRepository repository;
-    private SequentialSpace lobby;
-    private SequentialSpace games;
-
-    public LobbyHandler(String host, String port, SpaceRepository repository, SequentialSpace lobby,
-            SequentialSpace games) {
-        this.host = host;
-        this.port = port;
-        this.repository = repository;
-        this.lobby = lobby;
-        this.games = games;
     }
 
     @Override
     public void run() {
-
         while (true) {
             Integer gameC = 0;
 
