@@ -17,7 +17,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.TreeView;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -30,9 +29,6 @@ public class LobbyController {
 
     @FXML
     TextFlow messages;
-
-    @FXML
-    TreeView<String> tree;
 
     private String host;
     private String port;
@@ -71,7 +67,7 @@ public class LobbyController {
 
     @FXML
     private void create(ActionEvent event) {
-        TextInputDialog dialog = new TextInputDialog("Username");
+        TextInputDialog dialog = new TextInputDialog("Game name");
         Node node = (Node) event.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
         dialog.initOwner(stage);
@@ -179,14 +175,35 @@ class chatHandler implements Runnable {
 class LobbyHandler implements Runnable {
 
     private RemoteSpace lobby;
+    private int gameInc;
 
     public LobbyHandler(RemoteSpace lobby) {
         this.lobby = lobby;
+        gameInc = 0;
     }
 
     @Override
     public void run() {
-
+        try {
+            Object[] game = lobby.query(new ActualField("games"), new FormalField(Integer.class),
+                    new FormalField(String.class), new FormalField(String.class));
+            int gameC = (int) game[1];
+            if (gameC > gameInc) {
+                List<Object[]> games = lobby.queryAll(new ActualField("games"), new FormalField(Integer.class),
+                        new FormalField(String.class), new FormalField(String.class));
+                for (int i = gameInc; i < gameC; i++) {
+                    Object[] aGame = games.get(i);
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                        }
+                    });
+                }
+                gameInc++;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
