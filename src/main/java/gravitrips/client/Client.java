@@ -20,7 +20,7 @@ import javafx.stage.Stage;
 public class Client extends Application {
     private static Settings settings;
     private FXMLLoader menuLoader;
-    private Parent mainMenuRoot;
+    private static Parent mainMenuRoot;
     private Image icon16;
     private static Image icon32;
     private static FXMLLoader lobbyLoader;
@@ -61,10 +61,10 @@ public class Client extends Application {
         alert.setGraphic(new ImageView(icon32));
         if (alert.showAndWait().get() == ButtonType.OK)
             Platform.exit();
-            System.exit(0);
+        System.exit(0);
     }
 
-    private void mainMenu(Stage primaryStage) {
+    static void mainMenu(Stage primaryStage) {
         scene.setRoot(mainMenuRoot);
         primaryStage.setScene(scene);
         primaryStage.sizeToScene();

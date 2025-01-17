@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -28,7 +29,7 @@
             </ScrollPane>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0">
                <children>
-                  <TextField fx:id="lobbymessage" alignment="TOP_LEFT" prefHeight="70.0" prefWidth="280.0">
+                  <TextField fx:id="lobbymessage" alignment="TOP_LEFT" onAction="#onEnter" prefHeight="70.0" prefWidth="280.0">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -52,29 +53,44 @@
          <children>
             <ScrollPane hbarPolicy="NEVER" minViewportHeight="300.0" prefHeight="200.0" prefWidth="200.0">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="200.0" />
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="200.0">
+                     <children>
+                        <TreeView fx:id="tree" prefWidth="200.0" />
+                     </children></AnchorPane>
               </content>
             </ScrollPane>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+            <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#create" prefWidth="110.0" text="Create game">
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#create" prefWidth="110.0" text="Create">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#join" prefWidth="110.0" text="Join">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
+                  <Button mnemonicParsing="false" onAction="#menu" prefHeight="69.0" text="Main menu" textAlignment="CENTER" wrapText="true">
                      <font>
-                        <Font size="14.0" />
+                        <Font size="18.0" />
                      </font>
-                     <VBox.margin>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Button mnemonicParsing="false" onAction="#join" prefWidth="110.0" text="Join">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
-                     </VBox.margin>
+                     <HBox.margin>
+                        <Insets bottom="15.0" left="4.0" right="8.0" top="15.0" />
+                     </HBox.margin>
                   </Button>
                </children>
-            </VBox>
+            </HBox>
          </children>
       </VBox>
    </children>
