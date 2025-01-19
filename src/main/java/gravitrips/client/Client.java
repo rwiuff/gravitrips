@@ -28,7 +28,6 @@ public class Client extends Application {
     private static LobbyController lobbyController;
     private Image icon64;
     private static Scene scene;
-    private static Server server;
 
     public static void main(String[] args) {
         settings = new Settings();
@@ -94,7 +93,6 @@ public class Client extends Application {
     public static void host(Stage stage) throws IOException, InterruptedException {
         Thread serverThread = new Thread(new Server(settings));
         serverThread.start();
-        Client.server = new Server(settings);
         startLobby(stage);
     }
 

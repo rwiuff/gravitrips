@@ -2,9 +2,11 @@ package gravitrips.client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
 import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
@@ -17,6 +19,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -30,9 +34,11 @@ public class LobbyController {
     @FXML
     TextFlow messages;
 
+    @FXML
+    TreeView<String> tree;
+
     private String host;
     private String port;
-    private Settings settings;
     private String userName;
 
     private RemoteSpace lobby;
@@ -42,25 +48,24 @@ public class LobbyController {
     private RemoteSpace game_space;
 
     public void setup(Settings settings) throws InterruptedException {
-        this.settings = settings;
         this.host = settings.getHost();
         this.port = settings.getPort();
         this.userName = settings.getUserName();
         openLobby();
     }
 
-    private void openLobby() throws InterruptedException {
+    private void openLobby() {
         try {
             String uri = "tcp://" + host + ":" + port + "/lobby?keep";
             System.out.println("Connecting to lobby " + uri + "...");
             this.lobby = new RemoteSpace(uri);
             String chatUri = "tcp://" + host + ":" + port + "/global_chat?keep";
+            System.out.println("Connecting to chat " + chatUri + "...");
             this.globalChat = new RemoteSpace(chatUri);
             Thread chatThread = new Thread(new chatHandler(chatUri, messages));
             globalChat.put(userName, "Joined the chat");
             chatThread.start();
-            new Thread(new LobbyHandler(lobby)).start();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -87,6 +92,35 @@ public class LobbyController {
                 e.printStackTrace();
             }
         });
+    }
+
+    @FXML
+    private void refresh(ActionEvent event) throws InterruptedException {
+        System.out.println("refresh");
+        TreeItem<String> root = new TreeItem<>("Games");
+        root.setExpanded(true);
+        Map<String, String> userList = new HashMap<String, String>();
+        List<String> gameList = new ArrayList<String>();
+        List<Object[]> games = lobby.queryAll(new ActualField("gameURI"), new FormalField(String.class),
+                new FormalField(String.class),
+                new FormalField(String.class));
+        System.out.println(games.size());
+        for (Object[] entry : games) {
+            System.out.println(entry[1]);
+            System.out.println(entry[2]);
+            userList.put((String) entry[1], (String) entry[2]);
+            gameList.add((String) entry[2]);
+        }
+        for (String game : gameList) {
+            TreeItem<String> aGame = new TreeItem<String>(game);
+            for (Map.Entry<String, String> user : userList.entrySet()) {
+                if (user.getValue().equals(game)) {
+                    aGame.getChildren().add(new TreeItem<>(user.getKey()));
+                }
+            }
+            root.getChildren().add(aGame);
+        }
+        tree = new TreeView<>(root);
     }
 
     @FXML
@@ -170,40 +204,4 @@ class chatHandler implements Runnable {
             e.printStackTrace();
         }
     }
-}
-
-class LobbyHandler implements Runnable {
-
-    private RemoteSpace lobby;
-    private int gameInc;
-
-    public LobbyHandler(RemoteSpace lobby) {
-        this.lobby = lobby;
-        gameInc = 0;
-    }
-
-    @Override
-    public void run() {
-        try {
-            Object[] game = lobby.query(new ActualField("games"), new FormalField(Integer.class),
-                    new FormalField(String.class), new FormalField(String.class));
-            int gameC = (int) game[1];
-            if (gameC > gameInc) {
-                List<Object[]> games = lobby.queryAll(new ActualField("games"), new FormalField(Integer.class),
-                        new FormalField(String.class), new FormalField(String.class));
-                for (int i = gameInc; i < gameC; i++) {
-                    Object[] aGame = games.get(i);
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                        }
-                    });
-                }
-                gameInc++;
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

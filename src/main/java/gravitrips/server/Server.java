@@ -9,7 +9,6 @@ import org.jspace.SpaceRepository;
 import gravitrips.client.Settings;
 
 public class Server implements Runnable {
-    private Settings settings;
     private String host;
     private String port;
     private int rows;
@@ -20,7 +19,6 @@ public class Server implements Runnable {
     private SpaceRepository repository;
 
     public Server(Settings settings) throws InterruptedException {
-        this.settings = settings;
         this.host = settings.getHost();
         this.port = settings.getPort();
         this.rows = settings.getRows();
@@ -68,7 +66,6 @@ public class Server implements Runnable {
                     }
                     System.out.println("Telling " + userName + " to go for room " + gameID + " at " + gameURI + "...");
                     lobby.put("gameURI", userName, gameID, gameURI);
-                    lobby.put("games", gameC, gameID, gameURI);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -96,7 +93,6 @@ class gameHandler implements Runnable {
         try {
             while (true) {
                 Object[] message = game.get(new FormalField(String.class), new FormalField(String.class));
-                System.out.println("GAME " + gameID + " | " + message[0] + ":" + message[1]);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
