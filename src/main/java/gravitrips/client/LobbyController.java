@@ -35,7 +35,7 @@ public class LobbyController {
     TextFlow messages;
 
     @FXML
-    TreeView<String> tree;
+    TreeView<String> tree = new TreeView<>();
 
     private String host;
     private String port;
@@ -46,6 +46,8 @@ public class LobbyController {
     private RemoteSpace globalChat;
 
     private RemoteSpace game_space;
+
+    private TreeItem<String> root;
 
     public void setup(Settings settings) throws InterruptedException {
         this.host = settings.getHost();
@@ -65,6 +67,9 @@ public class LobbyController {
             Thread chatThread = new Thread(new chatHandler(chatUri, messages));
             globalChat.put(userName, "Joined the chat");
             chatThread.start();
+            this.root = new TreeItem<>("Games");
+            root.setExpanded(true);
+            tree.setRoot(root);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -96,18 +101,13 @@ public class LobbyController {
 
     @FXML
     private void refresh(ActionEvent event) throws InterruptedException {
-        System.out.println("refresh");
-        TreeItem<String> root = new TreeItem<>("Games");
-        root.setExpanded(true);
+        root.getChildren().clear();
         Map<String, String> userList = new HashMap<String, String>();
         List<String> gameList = new ArrayList<String>();
-        List<Object[]> games = lobby.queryAll(new ActualField("gameURI"), new FormalField(String.class),
+        List<Object[]> games = lobby.queryAll(new ActualField("games"), new FormalField(String.class),
                 new FormalField(String.class),
                 new FormalField(String.class));
-        System.out.println(games.size());
         for (Object[] entry : games) {
-            System.out.println(entry[1]);
-            System.out.println(entry[2]);
             userList.put((String) entry[1], (String) entry[2]);
             gameList.add((String) entry[2]);
         }
@@ -117,19 +117,30 @@ public class LobbyController {
                 if (user.getValue().equals(game)) {
                     aGame.getChildren().add(new TreeItem<>(user.getKey()));
                 }
+                aGame.setExpanded(true);
             }
             root.getChildren().add(aGame);
         }
-        tree = new TreeView<>(root);
     }
 
     @FXML
     private void join(ActionEvent event) {
-        System.out.println("join");
+        String game = tree.getSelectionModel().getSelectedItem().getValue();
+        try {
+            lobby.put("enter", userName, game);
+            Object[] response = lobby.get(new ActualField("gameURI"), new ActualField(userName),
+                    new ActualField(game), new FormalField(String.class));
+            String game_uri = (String) response[3];
+            System.out.println("Connecting to chat space " + game_uri);
+            this.game_space = new RemoteSpace(game_uri);
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void send(ActionEvent event) throws InterruptedException {
+        refresh(event);
         String message = lobbymessage.getText();
         lobbymessage.clear();
         globalChat.put(userName, message);

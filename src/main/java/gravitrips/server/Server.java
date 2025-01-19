@@ -66,6 +66,7 @@ public class Server implements Runnable {
                     }
                     System.out.println("Telling " + userName + " to go for room " + gameID + " at " + gameURI + "...");
                     lobby.put("gameURI", userName, gameID, gameURI);
+                    lobby.put("games", userName, gameID, gameURI);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
