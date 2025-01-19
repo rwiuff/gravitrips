@@ -133,6 +133,9 @@ public class LobbyController {
             String game_uri = (String) response[3];
             System.out.println("Connecting to chat space " + game_uri);
             this.game_space = new RemoteSpace(game_uri);
+            Node node = (Node) event.getSource();
+            Stage stage = (Stage) node.getScene().getWindow();
+            Client.game(stage,game_space);
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }

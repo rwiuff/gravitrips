@@ -94,6 +94,7 @@ class gameHandler implements Runnable {
         try {
             while (true) {
                 Object[] message = game.get(new FormalField(String.class), new FormalField(String.class));
+                System.out.println(message[0] + " : " + message[1]);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

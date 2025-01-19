@@ -3,6 +3,8 @@ package gravitrips.client;
 import java.io.IOException;
 import java.util.Optional;
 
+import org.jspace.RemoteSpace;
+
 import gravitrips.server.Server;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,6 +30,9 @@ public class Client extends Application {
     private static LobbyController lobbyController;
     private Image icon64;
     private static Scene scene;
+    private static FXMLLoader gameLoader;
+    private static Parent gameRoot;
+    private static GameController gameController;
 
     public static void main(String[] args) {
         settings = new Settings();
@@ -116,6 +121,21 @@ public class Client extends Application {
         lobbyLoader = new FXMLLoader(Client.class.getResource("/fxml/Lobby.fxml"));
         lobbyRoot = lobbyLoader.load();
         lobbyController = lobbyLoader.getController();
+    }
+
+    public static void game(Stage stage, RemoteSpace game_space) throws IOException {
+        loadGame();
+        gameController.setup(settings,game_space);
+        scene.setRoot(gameRoot);
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.centerOnScreen();
+    }
+
+    private static void loadGame() throws IOException {
+        gameLoader = new FXMLLoader(Client.class.getResource("/fxml/Game.fxml"));
+        gameRoot = gameLoader.load();
+        gameController = gameLoader.getController();
     }
 
 }
