@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextFlow;
 
@@ -26,6 +27,7 @@ public class GameController {
     private String userName;
     private RemoteSpace gameSpace;
     private Settings settings;
+    private Color fieldcolor;
 
     public void setup(Settings settings, RemoteSpace game_space)
             throws UnknownHostException, IOException, InterruptedException {
@@ -35,21 +37,28 @@ public class GameController {
         Thread chatThread = new Thread(new ClientChatHandler(gameSpace, messages));
         gameSpace.put(userName, "Joined the game");
         chatThread.start();
-        drawField();
+        drawBoard();
     }
 
-    private void drawField() {
+    private void drawBoard() {
         GridPane gridPane = new GridPane();
         // Local test driver
-        Game game = new Game(16,16);
-        Piece[][] field = game.getBoard();
-        for(int i = 0; i < settings.getRows(); i++){
-            for(int j = 0; j < settings.getColumns(); j++){
+        Game game = new Game(16, 16, "player1", "playerTwo");
+        Piece[][] board = game.getBoard();
+        fieldcolor = Color.rgb(237, 28, 36);
+        for (int i = 0; i < settings.getRows(); i++) {
+            for (int j = 0; j < settings.getColumns(); j++) {
                 Rectangle rectangle = new Rectangle();
                 rectangle.setWidth(20);
                 rectangle.setHeight(20);
-                rectangle.setFill(Color.CRIMSON);
+                rectangle.setFill(fieldcolor);
+                rectangle.setId(i + ";" + j);
                 gridPane.add(rectangle, i, j);
+                Piece piece = board[i][j];
+                Circle c = new Circle(10, piece.getColour());
+                c.setCenterX(rectangle.getWidth()/2);
+                c.setCenterY(rectangle.getHeight()/2);
+                gridPane.add(c, i, i);
             }
         }
         gridPane.setAlignment(Pos.CENTER);

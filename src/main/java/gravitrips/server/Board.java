@@ -7,13 +7,27 @@ public class Board {
     private int columns;
     private Piece[][] board;
     private Piece empty;
+    private Piece player1;
+    private Piece player2;
 
     public Board(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
         this.board = new Piece[rows][columns];
-        this.empty = new Piece("empty", Color.BEIGE);
+        this.empty = new Piece("empty", Color.rgb(237, 28, 36));
         reset();
+    }
+
+    public Piece getPlayer1() {
+        return player1;
+    }
+
+    public Piece getPlayer2() {
+        return player2;
+    }
+
+    public Piece getEmpty() {
+        return empty;
     }
 
     public void reset() {

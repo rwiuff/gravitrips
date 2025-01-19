@@ -1,32 +1,28 @@
 package gravitrips.server;
 
-import java.util.Arrays;
-
-import javafx.scene.paint.Color;
-
 public class Driver {
     static Game game;
     private static int n = 6;
     private static int m = 6;
 
     public static void main(String[] args) {
-        Piece player1 = new Piece("Player1", Color.BEIGE);
-        Piece player2 = new Piece("Player2", Color.ALICEBLUE);
-        game = new Game(n, m);
+        String player1 = "Player1";
+        String player2 = "Player2";
+        game = new Game(n, m, player1, player2);
         printGameState();
         try {
-            game.putPiece(player2, 1);
-            game.putPiece(player2, 2);
-            game.putPiece(player2, 2);
-            game.putPiece(player1, 0);
-            game.putPiece(player1, 1);
-            game.putPiece(player1, 2);
-            game.putPiece(player2, 3);
-            game.putPiece(player1, 3);
-            game.putPiece(player1, 3);
+            game.putPiece(game.getPlayerTwo(), 1);
+            game.putPiece(game.getPlayerTwo(), 2);
+            game.putPiece(game.getPlayerTwo(), 2);
+            game.putPiece(game.getPlayerOne(), 0);
+            game.putPiece(game.getPlayerOne(), 1);
+            game.putPiece(game.getPlayerOne(), 2);
+            game.putPiece(game.getPlayerTwo(), 3);
+            game.putPiece(game.getPlayerOne(), 3);
+            game.putPiece(game.getPlayerOne(), 3);
             System.out.println(game.checkState());
             printGameState();
-            game.putPiece(player1, 3);
+            game.putPiece(game.getPlayerOne(), 3);
             System.out.println(game.checkState());
             printGameState();
             System.out.println("Won by player " + game.getLastMove().getPiece().getPlayer());

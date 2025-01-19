@@ -2,23 +2,39 @@ package gravitrips.server;
 
 import java.util.ArrayList;
 
+import javafx.scene.paint.Color;
+
 public class Game {
 
-    private Board field;
+    private Board board;
     private ArrayList<Move> moves = new ArrayList<Move>();
-    private String playerOne;
-    private String playerTwo;
+    private Piece playerOne;
+    private Piece playerTwo;
 
-    public Game(int rows, int columns) {
-        this.field = new Board(rows, columns);
+    public Game(int rows, int columns, String playerOne, String playerTwo) {
+        this.board = new Board(rows, columns);
+        this.playerOne = new Piece(playerOne, Color.rgb(255, 255, 255));
+        this.playerTwo = new Piece(playerTwo, Color.rgb(147, 149, 152));
+    }
+
+    public Piece getPlayerOne() {
+        return playerOne;
+    }
+
+    public Piece getPlayerTwo() {
+        return playerTwo;
+    }
+
+    public Piece getEmpty() {
+        return board.getEmpty();
     }
 
     public Piece[][] getBoard() {
-        return field.getBoard();
+        return board.getBoard();
     }
 
     public void putPiece(Piece player, int column) throws Exception {
-        Move lastMove = field.dropPiece(player, column);
+        Move lastMove = board.dropPiece(player, column);
         moves.add(lastMove);
     }
 
@@ -40,35 +56,35 @@ public class Game {
         int points = 1;
         switch (direction) {
             case 0:
-                if (field.lookUp(row - 1, column - 1) == player)
+                if (board.lookUp(row - 1, column - 1) == player)
                     points += connected(direction, player, row - 1, column - 1);
                 break;
             case 1:
-                if (field.lookUp(row - 1, column) == player)
+                if (board.lookUp(row - 1, column) == player)
                     points += connected(direction, player, row - 1, column);
                 break;
             case 2:
-                if (field.lookUp(row - 1, column + 1) == player)
+                if (board.lookUp(row - 1, column + 1) == player)
                     points += connected(direction, player, row - 1, column + 1);
                 break;
             case 3:
-                if (field.lookUp(row, column - 1) == player)
+                if (board.lookUp(row, column - 1) == player)
                     points += connected(direction, player, row, column - 1);
                 break;
             case 4:
-                if (field.lookUp(row, column + 1) == player)
+                if (board.lookUp(row, column + 1) == player)
                     points += connected(direction, player, row, column + 1);
                 break;
             case 5:
-                if (field.lookUp(row + 1, column - 1) == player)
+                if (board.lookUp(row + 1, column - 1) == player)
                     points += connected(direction, player, row + 1, column - 1);
                 break;
             case 6:
-                if (field.lookUp(row + 1, column) == player)
+                if (board.lookUp(row + 1, column) == player)
                     points += connected(direction, player, row + 1, column);
                 break;
             case 7:
-                if (field.lookUp(row + 1, column + 1) == player)
+                if (board.lookUp(row + 1, column + 1) == player)
                     points += connected(direction, player, row + 1, column + 1);
                 break;
             default:

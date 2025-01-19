@@ -1,7 +1,6 @@
 package gravitrips.client;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,6 @@ import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -22,7 +20,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
@@ -93,6 +90,7 @@ public class LobbyController {
                 String game_uri = (String) response[3];
                 System.out.println("Connecting to chat space " + game_uri);
                 this.game_space = new RemoteSpace(game_uri);
+                refresh(event);
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
