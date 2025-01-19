@@ -3,7 +3,6 @@ package gravitrips.server;
 import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.SequentialSpace;
-import org.jspace.Space;
 import org.jspace.SpaceRepository;
 
 import gravitrips.client.Settings;
@@ -32,7 +31,7 @@ public class Server implements Runnable {
         this.games = new SequentialSpace();
         this.globalChat = new SequentialSpace();
         repository.add("global_chat", globalChat);
-        new Thread(new ChatHandler(globalChat)).start();
+        new Thread(new ServerChatHandler(globalChat)).start();
     }
 
     @Override
@@ -76,17 +75,18 @@ public class Server implements Runnable {
 }
 
 class gameHandler implements Runnable {
-    private Space game;
+    private SequentialSpace game;
     private String gameID;
     private String spaceID;
 
-    public gameHandler(String gameID, String spaceID, String uri, SpaceRepository repository) {
+    public gameHandler(String gameID, String spaceID, String uri, SpaceRepository repository) throws InterruptedException {
         this.gameID = gameID;
         this.spaceID = spaceID;
 
         game = new SequentialSpace();
 
         repository.add(this.spaceID, game);
+        new Thread(new ServerChatHandler(game)).start();;
     }
 
     @Override
@@ -98,32 +98,6 @@ class gameHandler implements Runnable {
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-    }
-}
-
-class ChatHandler implements Runnable {
-    private SequentialSpace globalChat;
-    private int inc;
-
-    public ChatHandler(SequentialSpace globalChat) throws InterruptedException {
-        this.globalChat = globalChat;
-        globalChat.put(0);
-        this.inc = 0;
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                Object[] message = globalChat.get(new FormalField(String.class), new FormalField(String.class));
-                inc++;
-                globalChat.put(inc, message[0], message[1]);
-                globalChat.put(inc);
-                globalChat.get(new ActualField(inc - 1));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

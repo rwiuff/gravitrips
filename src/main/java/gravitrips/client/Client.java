@@ -123,7 +123,7 @@ public class Client extends Application {
         lobbyController = lobbyLoader.getController();
     }
 
-    public static void game(Stage stage, RemoteSpace game_space) throws IOException {
+    public static void game(Stage stage, RemoteSpace game_space) throws IOException, InterruptedException {
         loadGame();
         gameController.setup(settings,game_space);
         scene.setRoot(gameRoot);

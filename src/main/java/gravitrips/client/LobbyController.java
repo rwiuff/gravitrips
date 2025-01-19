@@ -64,7 +64,7 @@ public class LobbyController {
             String chatUri = "tcp://" + host + ":" + port + "/global_chat?keep";
             System.out.println("Connecting to chat " + chatUri + "...");
             this.globalChat = new RemoteSpace(chatUri);
-            Thread chatThread = new Thread(new chatHandler(chatUri, messages));
+            Thread chatThread = new Thread(new ClientChatHandler(globalChat, messages));
             globalChat.put(userName, "Joined the chat");
             chatThread.start();
             this.root = new TreeItem<>("Games");
@@ -135,7 +135,7 @@ public class LobbyController {
             this.game_space = new RemoteSpace(game_uri);
             Node node = (Node) event.getSource();
             Stage stage = (Stage) node.getScene().getWindow();
-            Client.game(stage,game_space);
+            Client.game(stage, game_space);
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
@@ -171,51 +171,4 @@ public class LobbyController {
         send(event);
     }
 
-}
-
-class chatHandler implements Runnable {
-
-    private RemoteSpace chatroom;
-    private int localInc;
-
-    @FXML
-    TextFlow messages;
-
-    public chatHandler(String chatUri, TextFlow messages) throws UnknownHostException, IOException {
-        this.messages = messages;
-        this.chatroom = new RemoteSpace(chatUri);
-        System.out.println("Connecting to chat space " + chatUri);
-        this.localInc = 0;
-    }
-
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                int inc = (int) chatroom.queryp(new FormalField(Integer.class))[0];
-                if (inc > localInc) {
-                    List<Object[]> history = chatroom.queryAll(new FormalField(Integer.class),
-                            new FormalField(String.class), new FormalField(String.class));
-                    for (int i = localInc; i < inc; i++) {
-                        Object[] message = history.get(i);
-                        Text user = new Text();
-                        user.setText(message[1] + ": ");
-                        user.setStyle("-fx-font-weight: bold");
-                        Text print = new Text();
-                        print.setText(message[2] + "\n");
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                messages.getChildren().add(user);
-                                messages.getChildren().add(print);
-                            }
-                        });
-                    }
-                    localInc = inc;
-                }
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
