@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import org.jspace.RemoteSpace;
 
 import gravitrips.server.Game;
+import gravitrips.server.Piece;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -41,7 +42,7 @@ public class GameController {
         GridPane gridPane = new GridPane();
         // Local test driver
         Game game = new Game(16,16);
-        int[][] field = game.getField();
+        Piece[][] field = game.getBoard();
         for(int i = 0; i < settings.getRows(); i++){
             for(int j = 0; j < settings.getColumns(); j++){
                 Rectangle rectangle = new Rectangle();

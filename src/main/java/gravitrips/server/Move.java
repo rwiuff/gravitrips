@@ -1,18 +1,18 @@
 package gravitrips.server;
 
 public class Move {
-    private int player;
+    private Piece piece;
     private int row;
     private int column;
 
-    public Move(int player, int row, int column) {
-        this.player = player;
+    public Move(Piece piece, int row, int column) {
+        this.piece = piece;
         this.row = row;
         this.column = column;
     }
 
-    public int getPlayer() {
-        return player;
+    public Piece getPiece() {
+        return piece;
     }
 
     public int getRow() {

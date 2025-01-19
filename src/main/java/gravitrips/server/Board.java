@@ -1,45 +1,49 @@
 package gravitrips.server;
 
-public class Field {
+import javafx.scene.paint.Color;
+
+public class Board {
     private int rows;
     private int columns;
-    private int[][] field;
+    private Piece[][] board;
+    private Piece empty;
 
-    public Field(int rows, int columns) {
+    public Board(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
-        this.field = new int[rows][columns];
+        this.board = new Piece[rows][columns];
+        this.empty = new Piece("empty", Color.BEIGE);
         reset();
     }
 
     public void reset() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                field[i][j] = 0;
+                board[i][j] = empty;
             }
         }
     }
 
-    public int[][] getField() {
-        return field;
+    public Piece[][] getBoard() {
+        return board;
     }
 
     public boolean columnFull(int column) {
-        return (field[0][column] != 0);
+        return (board[0][column] != null);
     }
 
-    public Move dropPiece(int player, int column) throws Exception {
+    public Move dropPiece(Piece player, int column) throws Exception {
         if (column >= columns) {
             throw new IndexOutOfBoundsException(column);
-        } else if (lookUp(0, column) != 0) {
+        } else if (lookUp(0, column) != empty) {
             throw new Exception("Column occupied");
-        } else if (lookUp(rows - 1, column) == 0) {
-            field[rows - 1][column] = player;
+        } else if (lookUp(rows - 1, column) == empty) {
+            board[rows - 1][column] = player;
             return new Move(player, rows - 1, column);
         } else {
             for (int i = 0; i < rows; i++) {
-                if (lookUp(i + 1, column) != 0) {
-                    field[i][column] = player;
+                if (lookUp(i + 1, column) != empty) {
+                    board[i][column] = player;
                     return new Move(player, i, column);
                 }
             }
@@ -47,13 +51,13 @@ public class Field {
         return null;
     }
 
-    public int lookUp(int row, int column) {
+    public Piece lookUp(int row, int column) {
         if (row < 0 || row >= rows) {
-            return 0;
+            return null;
         } else if (column < 0 || column >= columns) {
-            return 0;
+            return null;
         } else {
-            return field[row][column];
+            return board[row][column];
         }
     }
 }

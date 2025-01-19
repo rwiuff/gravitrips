@@ -4,37 +4,39 @@ import java.util.ArrayList;
 
 public class Game {
 
-    private Field field;
+    private Board field;
     private ArrayList<Move> moves = new ArrayList<Move>();
+    private String playerOne;
+    private String playerTwo;
 
     public Game(int rows, int columns) {
-        this.field = new Field(rows, columns);
+        this.field = new Board(rows, columns);
     }
 
-    public int[][] getField() {
-        return field.getField();
+    public Piece[][] getBoard() {
+        return field.getBoard();
     }
 
-    public void putPiece(int player, int column) throws Exception {
+    public void putPiece(Piece player, int column) throws Exception {
         Move lastMove = field.dropPiece(player, column);
         moves.add(lastMove);
     }
 
     public boolean checkState() {
         Move latestMove = moves.get(moves.size() - 1);
-        int player = latestMove.getPlayer();
+        Piece piece = latestMove.getPiece();
         int row = latestMove.getRow();
         int column = latestMove.getColumn();
         boolean connect = false;
         for (int direction = 0; direction < 8; direction++) {
-            connect = (connected(direction, player, row, column) >= 4) ? true : false;
+            connect = (connected(direction, piece, row, column) >= 4) ? true : false;
             if (connect)
                 return connect;
         }
         return connect;
     }
 
-    private int connected(int direction, int player, int row, int column) {
+    private int connected(int direction, Piece player, int row, int column) {
         int points = 1;
         switch (direction) {
             case 0:
