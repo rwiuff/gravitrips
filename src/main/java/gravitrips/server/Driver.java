@@ -6,8 +6,8 @@ public class Driver {
     private static int m = 6;
 
     public static void main(String[] args) {
-        String player1 = "Player1";
-        String player2 = "Player2";
+        String player1 = "Play1";
+        String player2 = "Play2";
         game = new Game(n, m, player1, player2);
         printGameState();
         try {
@@ -34,8 +34,8 @@ public class Driver {
     private static void printGameState() {
         Piece[][] field = game.getBoard();
         for (Piece[] row : field) {
-            for(Piece piece : row){
-                System.out.print(piece.getPlayer());
+            for (Piece piece : row) {
+                System.out.print(" " + piece.getPlayer() + " ");
             }
             System.out.println("");
         }
