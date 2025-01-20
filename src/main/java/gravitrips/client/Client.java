@@ -101,14 +101,16 @@ public class Client extends Application {
         startLobby(stage);
     }
 
-    private static void startLobby(Stage stage) throws IOException, InterruptedException {
-        TextInputDialog dialog = new TextInputDialog("Username");
-        dialog.initOwner(stage);
-        dialog.setTitle("Gravitrips");
-        dialog.setHeaderText("Chose your username");
-        dialog.setContentText("Input name");
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(userName -> Client.settings.setUserName(userName));
+    static void startLobby(Stage stage) throws IOException, InterruptedException {
+        if (settings.getUserName() == null) {
+            TextInputDialog dialog = new TextInputDialog("Username");
+            dialog.initOwner(stage);
+            dialog.setTitle("Gravitrips");
+            dialog.setHeaderText("Chose your username");
+            dialog.setContentText("Input name");
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(userName -> Client.settings.setUserName(userName));
+        }
         loadLobby();
         lobbyController.setup(settings);
         scene.setRoot(lobbyRoot);
@@ -125,7 +127,7 @@ public class Client extends Application {
 
     public static void game(Stage stage, RemoteSpace game_space) throws IOException, InterruptedException {
         loadGame();
-        gameController.setup(settings,game_space);
+        gameController.setup(settings, game_space);
         scene.setRoot(gameRoot);
         stage.setScene(scene);
         stage.sizeToScene();

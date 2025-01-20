@@ -10,18 +10,16 @@ import gravitrips.client.Settings;
 public class Server implements Runnable {
     private String host;
     private String port;
-    private int rows;
-    private int columns;
     private SequentialSpace lobby;
     private SequentialSpace games;
     private SequentialSpace globalChat;
     private SpaceRepository repository;
+    private Settings settings;
 
     public Server(Settings settings) throws InterruptedException {
         this.host = settings.getHost();
         this.port = settings.getPort();
-        this.rows = settings.getRows();
-        this.columns = settings.getColumns();
+        this.settings = settings;
         this.repository = new SpaceRepository();
         this.lobby = new SequentialSpace();
         repository.add("lobby", lobby);
@@ -59,7 +57,7 @@ public class Server implements Runnable {
                         System.out.println("Creating game " + gameID + " for " + userName + "...");
                         gameURI = "tcp://" + host + ":" + port + "/game" + gameC + "?keep";
                         System.out.println("Setting up game " + gameURI + "...");
-                        new Thread(new gameHandler(gameID, "game" + gameC, gameURI, repository)).start();
+                        new Thread(new gameHandler(gameID, "game" + gameC, gameURI, repository, settings)).start();
                         games.put(gameID, gameC);
                         gameC++;
                     }
@@ -70,34 +68,6 @@ public class Server implements Runnable {
                     e.printStackTrace();
                 }
             }
-        }
-    }
-}
-
-class gameHandler implements Runnable {
-    private SequentialSpace game;
-    private String gameID;
-    private String spaceID;
-
-    public gameHandler(String gameID, String spaceID, String uri, SpaceRepository repository) throws InterruptedException {
-        this.gameID = gameID;
-        this.spaceID = spaceID;
-
-        game = new SequentialSpace();
-
-        repository.add(this.spaceID, game);
-        new Thread(new ServerChatHandler(game)).start();;
-    }
-
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                Object[] message = game.get(new FormalField(String.class), new FormalField(String.class));
-                System.out.println(message[0] + " : " + message[1]);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }

@@ -42,10 +42,6 @@ public class Board {
         return board;
     }
 
-    public boolean columnFull(int column) {
-        return (board[0][column] != null);
-    }
-
     public Move dropPiece(Piece player, int column) throws Exception {
         if (column >= columns) {
             throw new IndexOutOfBoundsException(column);

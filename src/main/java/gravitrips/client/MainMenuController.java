@@ -43,9 +43,8 @@ public class MainMenuController {
 
         ButtonType connect = new ButtonType("Connect");
         ButtonType host = new ButtonType("Host");
-        ButtonType cancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
-        alert.getButtonTypes().setAll(connect, host, cancel);
+        alert.getButtonTypes().setAll(connect, host);
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == connect) {
