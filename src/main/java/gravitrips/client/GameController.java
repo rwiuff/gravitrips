@@ -2,8 +2,12 @@ package gravitrips.client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+
+import org.jspace.ActualField;
+import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 
+import gravitrips.server.Board;
 import gravitrips.server.Game;
 import gravitrips.server.Piece;
 import javafx.event.ActionEvent;
@@ -32,6 +36,7 @@ public class GameController {
     StackPane gameField = new StackPane();
     @FXML
     Label label = new Label();
+    private Board board;
     private String userName;
     private RemoteSpace gameSpace;
     private Settings settings;
@@ -46,14 +51,42 @@ public class GameController {
         label.setVisible(false);
         gameSpace.put(userName, "Joined the game");
         chatThread.start();
-        drawBoard();
+        firsDraw();
+        run();
+    }
+
+    private void firsDraw() {
+        GridPane gridPane = new GridPane();
+        fieldcolor = Color.rgb(237, 28, 36);
+        for (int i = 1; i <= settings.getRows(); i++) {
+            for (int j = 0; j < settings.getColumns(); j++) {
+                Rectangle rectangle = new Rectangle();
+                rectangle.setWidth(20);
+                rectangle.setHeight(20);
+                rectangle.setFill(fieldcolor);
+                rectangle.setId(i + ";" + j);
+                gridPane.add(rectangle, i - 1, j);
+            }
+        }
+        gridPane.setAlignment(Pos.CENTER);
+        gameField.getChildren().add(gridPane);
+        StackPane.setAlignment(gridPane, Pos.CENTER);
+    }
+
+    private void run() {
+        while (true) {
+            // try {
+            //     Object[] channel = gameSpace.get(new ActualField("player"+ userName),new FormalField());
+            //     String channelURI;
+            // } catch (InterruptedException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // }
+        }
     }
 
     private void drawBoard() {
         GridPane gridPane = new GridPane();
-        // Local test driver
-        Game game = new Game(16, 16, "player1", "playerTwo");
-        Piece[][] board = game.getBoard();
         fieldcolor = Color.rgb(237, 28, 36);
         for (int i = 0; i < settings.getColumns(); i++) {
             Rectangle rectangle = new Rectangle();
@@ -62,8 +95,8 @@ public class GameController {
             rectangle.setFill(fieldcolor);
             rectangle.setId(i + ";" + 0);
             gridPane.add(rectangle, i, 0);
-            if (board[0][i].getPlayer().equals("empty")) {
-                Piece piece = game.getPlayerOne();
+            if (board.lookUp(0, i).getPlayer().equals("empty")) {
+                Piece piece = board.lookUp(0, i);
                 Circle c = new Circle(10, piece.getColour());
                 c.setCenterX(rectangle.getWidth() / 2);
                 c.setCenterY(rectangle.getHeight() / 2);
@@ -77,8 +110,8 @@ public class GameController {
                 rectangle.setHeight(20);
                 rectangle.setFill(fieldcolor);
                 rectangle.setId(i + ";" + j);
-                gridPane.add(rectangle, i-1, j);
-                Piece piece = board[i-1][j];
+                gridPane.add(rectangle, i - 1, j);
+                Piece piece = board.lookUp(i - 1, j);
                 Circle c = new Circle(10, piece.getColour());
                 c.setCenterX(rectangle.getWidth() / 2);
                 c.setCenterY(rectangle.getHeight() / 2);
@@ -88,7 +121,6 @@ public class GameController {
         gridPane.setAlignment(Pos.CENTER);
         gameField.getChildren().add(gridPane);
         StackPane.setAlignment(gridPane, Pos.CENTER);
-        // Ends here
     }
 
     @FXML

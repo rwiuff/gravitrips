@@ -133,6 +133,7 @@ public class LobbyController {
             this.game_space = new RemoteSpace(game_uri);
             Node node = (Node) event.getSource();
             Stage stage = (Stage) node.getScene().getWindow();
+            game_space.put("joining", userName);
             Client.game(stage, game_space);
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
