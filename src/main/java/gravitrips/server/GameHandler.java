@@ -63,7 +63,7 @@ class gameHandler implements Runnable {
             while (game.checkState() == false) {
                 playerOneChannel.put("continue");
                 playerTwoChannel.put("continue");
-                if (checkPlayerTurn(playerTurn)) {
+                if (checkPlayerTurn(playerTurn) == 1) {
                     playerOneChannel.put("turn", 1);
                     playerTwoChannel.put("turn", 1);
                     int column = (int) playerOneChannel.get(new FormalField(Integer.class))[0];
@@ -105,8 +105,8 @@ class gameHandler implements Runnable {
         }
     }
 
-    private boolean checkPlayerTurn(int playerTurn) {
-        return playerTurn % 2 == 1;
+    private int checkPlayerTurn(int playerTurn) {
+        return playerTurn % 2;
     }
 
     private void sendBoard() {
