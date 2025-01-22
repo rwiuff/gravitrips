@@ -2,11 +2,16 @@ package gravitrips.client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.concurrent.CountDownLatch;
 
 import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 import com.google.gson.Gson;
+
+import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -74,6 +79,58 @@ public class GameController {
         }
     }
 
+    Service<Void> service = new Service<Void>() {
+        @Override
+        protected Task<Void> createTask() {
+            return new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        while (true) {
+                            String branch = (String) channel.get(new FormalField(String.class))[0];
+                            if (branch.equals("continue")) {
+                                System.out.println("Client: Continuing");
+                                int turn = (int) channel.get(new ActualField("turn"),
+                                        new FormalField(Integer.class))[1];
+                                if (turn == player) {
+                                    System.out.println("Client: My turn");
+                                    final CountDownLatch latch = new CountDownLatch(1);
+                                    Platform.runLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                drawBoard(true);
+                                                getInput();
+                                            } finally {
+                                                latch.countDown();
+                                            }
+                                        }
+                                    });
+                                    latch.await();
+                                    System.out.print("Afterclick");
+                                    while (true) {
+                                        branch = (String) channel.get(new FormalField(String.class))[0];
+                                        if (branch.equals("continue")) {
+                                            getInput();
+                                        } else
+                                            break;
+                                    }
+                                }
+                                getBoard();
+                                drawBoard(false);
+                            } else
+                                break;
+                        }
+                        winner();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+        }
+    };
+
     private void run() {
         try {
             while (true) {
@@ -84,42 +141,19 @@ public class GameController {
                     break;
                 }
             }
-            while (true) {
-                String branch = (String) channel.get(new FormalField(String.class))[0];
-                if (branch.equals("continue")) {
-                    System.out.println("Client: Continuing");
-                    int turn = (int) channel.get(new ActualField("turn"), new FormalField(Integer.class))[1];
-                    if (turn == player) {
-                        System.out.println("Client: My turn");
-                        drawBoard(true);
-                        getInput();
-                        System.out.print("Afterclick");
-                        while (true) {
-                            branch = (String) channel.get(new FormalField(String.class))[0];
-                            if (branch.equals("continue")) {
-                                getInput();
-                            } else
-                                break;
-                        }
-                    }
-                    getBoard();
-                    drawBoard(false);
-                } else
-                    break;
-            }
-            winner();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
+        service.start();
     }
 
-    private int getInput() {
+    private void getInput() {
         gridPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                Object source = event.getSource();
-                int input = GridPane.getColumnIndex((Pane) source);
+                System.out.println(event.getSource().getClass().getName());
+                GridPane source = (GridPane) event.getSource();
+                int input = GridPane.getColumnIndex(source);
                 System.out.println("Click " + input);
                 try {
                     channel.put(input);
@@ -127,9 +161,7 @@ public class GameController {
                     e.printStackTrace();
                 }
             }
-
         });
-        return 1;
     }
 
     private void drawBoard(boolean b) {
