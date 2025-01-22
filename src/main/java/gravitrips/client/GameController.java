@@ -15,10 +15,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -28,7 +30,7 @@ import javafx.stage.Stage;
 
 public class GameController {
     @FXML
-    TextField gamemessage;
+    TextArea gamemessage;
     @FXML
     TextFlow messages;
     @FXML
@@ -49,9 +51,7 @@ public class GameController {
     private Color playerOneColour = Color.rgb(255, 255, 255);
     private Color playerTwoColour = Color.rgb(147, 149, 152);
     private Color playerColour;
-    protected Object source;
     private Scene scene;
-    protected int input;
 
     public void setup(Settings settings, String channelUri, String game_uri, Scene scene)
             throws UnknownHostException, IOException, InterruptedException {
@@ -99,12 +99,12 @@ public class GameController {
                     if (turn == player) {
                         System.out.println("Client: My turn");
                         drawBoard(true);
-                        channel.put(getInput());
+                        getInput();
                         System.out.print("Afterclick");
                         while (true) {
                             branch = (String) channel.get(new FormalField(String.class))[0];
                             if (branch.equals("continue")) {
-                                channel.put(getInput());
+                                getInput();
                             } else
                                 break;
                         }
@@ -122,14 +122,20 @@ public class GameController {
     }
 
     private int getInput() {
-        scene.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+        gridPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                input = onMouseClicked(event);
-                event.consume();
+                Object source = event.getSource();
+                int input = GridPane.getColumnIndex((Pane) source);
+                try {
+                    channel.put(input);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+            
         });
-        return input;
+        return 1;
     }
 
     private void drawBoard(boolean b) {
@@ -178,8 +184,8 @@ public class GameController {
     }
 
     @FXML
-    private void onEnter(ActionEvent event) throws InterruptedException {
-        send(event);
+    private void onEnter(KeyEvent event) throws InterruptedException {
+        if(event.getCode().equals(KeyCode.ENTER)) send(new ActionEvent());
     }
 
     @FXML
