@@ -148,19 +148,21 @@ public class GameController {
     }
 
     private void getInput() {
-        gridPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                System.out.println(event.getSource().getClass().getName());
-                GridPane source = (GridPane) event.getSource();
-                int input = GridPane.getColumnIndex(source);
-                System.out.println("Click " + input);
-                try {
-                    channel.put(input);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        gridPane.getChildren().forEach(item -> {
+            item.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    System.out.println(event.getSource().getClass().getName());
+                    Circle source = (Circle) event.getSource();
+                    int input = GridPane.getColumnIndex(source);
+                    System.out.println("Click " + input);
+                    try {
+                        channel.put(input);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+            });
         });
     }
 
