@@ -198,7 +198,7 @@ public class GameController {
                 if (board[0][i] == 0) {
                     Circle c = new Circle(57 / 2, playerColour);
                     c.setStroke(Color.rgb(50, 50, 50));
-                    c.setOpacity(.7);
+                    c.setOpacity(.3);
                     gridPane.add(c, i, 0);
                 }
             }
