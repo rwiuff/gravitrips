@@ -82,13 +82,20 @@ public class GameController {
     }
 
     private void run() {
-        // try {
-        //     while (true) {
-                
-        //     }
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        // }
+        try {
+            while (true) {
+                Object[] status = channel.get(new ActualField("status"), new FormalField(String.class));
+                if (status[1].equals("turn")) {
+                    channel.put(move());
+                } else if (status[1].equals("invalid")) {
+                    channel.put(move());
+                } else if (status[1].equals("winner")) {
+                    int winner = (int) channel.get(new ActualField("winner"), new FormalField(Integer.class))[1];
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void drawBoard() {
