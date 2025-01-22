@@ -36,9 +36,9 @@
                         <Font size="14.0" />
                      </font>
                   </TextField>
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="70.0">
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="75.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#send" prefWidth="56.0" text="Send">
+                        <Button mnemonicParsing="false" onAction="#send" prefWidth="58.0" text="Send">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -46,7 +46,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Button>
-                        <Button mnemonicParsing="false" onAction="#ready" prefWidth="56.0" text="Ready">
+                        <Button fx:id="readyBtn" mnemonicParsing="false" onAction="#ready" prefWidth="58.0" text="Ready">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -54,7 +54,7 @@
                               <Insets bottom="4.0" top="4.0" />
                            </VBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" onAction="#quit" prefWidth="56.0" text="Quit">
+                        <Button mnemonicParsing="false" onAction="#quit" prefWidth="58.0" text="Quit">
                            <font>
                               <Font size="14.0" />
                            </font>

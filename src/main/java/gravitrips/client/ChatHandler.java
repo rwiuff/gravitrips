@@ -23,7 +23,6 @@ class ClientChatHandler implements Runnable {
     public ClientChatHandler(RemoteSpace globalChat, TextFlow messages) throws UnknownHostException, IOException {
         this.messages = messages;
         this.chatroom = globalChat;
-        System.out.println("Connecting to chat space " + globalChat);
         this.localInc = 0;
     }
 

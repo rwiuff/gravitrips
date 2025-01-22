@@ -56,10 +56,8 @@ public class LobbyController {
     private void openLobby() {
         try {
             String uri = "tcp://" + host + ":" + port + "/lobby?keep";
-            System.out.println("Connecting to lobby " + uri + "...");
             this.lobby = new RemoteSpace(uri);
             String chatUri = "tcp://" + host + ":" + port + "/global_chat?keep";
-            System.out.println("Connecting to chat " + chatUri + "...");
             this.globalChat = new RemoteSpace(chatUri);
             Thread chatThread = new Thread(new ClientChatHandler(globalChat, messages));
             globalChat.put(userName, "Joined the chat");
@@ -88,7 +86,6 @@ public class LobbyController {
                 Object[] response = lobby.get(new ActualField("gameURI"), new ActualField(userName),
                         new ActualField(gameName), new FormalField(String.class));
                 String game_uri = (String) response[3];
-                System.out.println("Connecting to chat space " + game_uri);
                 this.game_space = new RemoteSpace(game_uri);
                 refresh(event);
             } catch (InterruptedException | IOException e) {
@@ -129,12 +126,14 @@ public class LobbyController {
             Object[] response = lobby.get(new ActualField("gameURI"), new ActualField(userName),
                     new ActualField(game), new FormalField(String.class));
             String game_uri = (String) response[3];
-            System.out.println("Connecting to chat space " + game_uri);
             this.game_space = new RemoteSpace(game_uri);
+            game_space.put("channel", "request", userName);
+            Object[] channel = game_space.get(new ActualField("channel"), new ActualField("response"),
+                    new ActualField(userName), new FormalField(String.class));
+            String channelUri = "tcp://" + host + ":" + port + "/" + (String) channel[3] + "?keep";
             Node node = (Node) event.getSource();
             Stage stage = (Stage) node.getScene().getWindow();
-            game_space.put("joining", userName);
-            Client.game(stage, game_space);
+            Client.game(stage, channelUri, game_uri);
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }

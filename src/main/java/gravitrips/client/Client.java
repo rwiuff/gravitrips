@@ -125,9 +125,9 @@ public class Client extends Application {
         lobbyController = lobbyLoader.getController();
     }
 
-    public static void game(Stage stage, RemoteSpace game_space) throws IOException, InterruptedException {
+    public static void game(Stage stage, String channelUri, String game_uri) throws IOException, InterruptedException {
         loadGame();
-        gameController.setup(settings, game_space);
+        gameController.setup(settings, channelUri, game_uri);
         scene.setRoot(gameRoot);
         stage.setScene(scene);
         stage.sizeToScene();

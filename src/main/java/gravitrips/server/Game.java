@@ -2,45 +2,27 @@ package gravitrips.server;
 
 import java.util.ArrayList;
 
-import javafx.scene.paint.Color;
-
 public class Game {
 
     private Board board;
     private ArrayList<Move> moves = new ArrayList<Move>();
-    private Piece playerOne;
-    private Piece playerTwo;
 
     public Game(int rows, int columns, String playerOne, String playerTwo) {
         this.board = new Board(rows, columns);
-        this.playerOne = new Piece(playerOne, Color.rgb(255, 255, 255));
-        this.playerTwo = new Piece(playerTwo, Color.rgb(147, 149, 152));
     }
 
-    public Piece getPlayerOne() {
-        return playerOne;
-    }
-
-    public Piece getPlayerTwo() {
-        return playerTwo;
-    }
-
-    public Piece getEmpty() {
-        return board.getEmpty();
-    }
-
-    public Piece[][] getBoard() {
+    public int[][] getBoard() {
         return board.getBoard();
     }
 
-    public void putPiece(Piece player, int column) throws Exception {
+    public void putPiece(int player, int column) throws Exception {
         Move lastMove = board.dropPiece(player, column);
         moves.add(lastMove);
     }
 
     public boolean checkState() {
         Move latestMove = moves.get(moves.size() - 1);
-        Piece piece = latestMove.getPiece();
+        int piece = latestMove.getPiece();
         int row = latestMove.getRow();
         int column = latestMove.getColumn();
         boolean connect = false;
@@ -52,7 +34,7 @@ public class Game {
         return connect;
     }
 
-    private int connected(int direction, Piece player, int row, int column) {
+    private int connected(int direction, int player, int row, int column) {
         int points = 1;
         switch (direction) {
             case 0:

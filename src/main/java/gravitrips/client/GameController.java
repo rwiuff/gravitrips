@@ -7,14 +7,15 @@ import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 
-import gravitrips.server.Board;
-import gravitrips.server.Game;
-import gravitrips.server.Piece;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -36,83 +37,72 @@ public class GameController {
     StackPane gameField = new StackPane();
     @FXML
     Label label = new Label();
-    private Board board;
+    @FXML
+    Button readyBtn;
+    private int[][] board;
     private String userName;
-    private RemoteSpace gameSpace;
-    private Settings settings;
-    private Color fieldcolor;
+    private RemoteSpace channel;
+    private RemoteSpace chat;
+    private Gson gson = new Gson();
+    private int rows;
+    private int columns;
+    private int player;
 
-    public void setup(Settings settings, RemoteSpace game_space)
+    public void setup(Settings settings, String channelUri, String game_uri)
             throws UnknownHostException, IOException, InterruptedException {
-        this.gameSpace = game_space;
         this.userName = settings.getUserName();
-        this.settings = settings;
-        Thread chatThread = new Thread(new ClientChatHandler(gameSpace, messages));
+        this.chat = new RemoteSpace(game_uri);
+        Thread chatThread = new Thread(new ClientChatHandler(chat, messages));
         label.setVisible(false);
-        gameSpace.put(userName, "Joined the game");
+        this.channel = new RemoteSpace(channelUri);
+        this.channel.put(userName, "Joined the game");
         chatThread.start();
-        firsDraw();
-        run();
-    }
-
-    private void firsDraw() {
-        GridPane gridPane = new GridPane();
-        fieldcolor = Color.rgb(237, 28, 36);
-        for (int i = 1; i <= settings.getRows(); i++) {
-            for (int j = 0; j < settings.getColumns(); j++) {
-                Rectangle rectangle = new Rectangle();
-                rectangle.setWidth(20);
-                rectangle.setHeight(20);
-                rectangle.setFill(fieldcolor);
-                rectangle.setId(i + ";" + j);
-                gridPane.add(rectangle, i - 1, j);
-            }
-        }
-        gridPane.setAlignment(Pos.CENTER);
-        gameField.getChildren().add(gridPane);
-        StackPane.setAlignment(gridPane, Pos.CENTER);
+        Object[] serverSettings = channel.get(new ActualField("setup"), new FormalField(Integer.class),
+                new FormalField(Integer.class), new FormalField(Integer.class));
+        this.rows = (int) serverSettings[1];
+        this.columns = (int) serverSettings[2];
+        this.player = (int) serverSettings[3];
+        String getBoard = (String) channel.get(new ActualField("board"), new FormalField(String.class))[1];
+        this.board = gson.fromJson(getBoard, int[][].class);
+        drawBoard();
     }
 
     private void run() {
-        while (true) {
-            // try {
-            //     Object[] channel = gameSpace.get(new ActualField("player"+ userName),new FormalField());
-            //     String channelURI;
-            // } catch (InterruptedException e) {
-            //     // TODO Auto-generated catch block
-            //     e.printStackTrace();
-            // }
-        }
+        // try {
+        // // while (true) {
+
+        // // }
+        // } catch (InterruptedException e) {
+        // e.printStackTrace();
+        // }
     }
 
     private void drawBoard() {
         GridPane gridPane = new GridPane();
-        fieldcolor = Color.rgb(237, 28, 36);
-        for (int i = 0; i < settings.getColumns(); i++) {
+        Color fieldcolor = Color.rgb(237, 28, 36);
+        for (int i = 0; i < columns; i++) {
             Rectangle rectangle = new Rectangle();
             rectangle.setWidth(20);
             rectangle.setHeight(20);
             rectangle.setFill(fieldcolor);
             rectangle.setId(i + ";" + 0);
             gridPane.add(rectangle, i, 0);
-            if (board.lookUp(0, i).getPlayer().equals("empty")) {
-                Piece piece = board.lookUp(0, i);
-                Circle c = new Circle(10, piece.getColour());
+            if (board[0][i] == 0) {
+                Circle c = new Circle(10, Color.rgb(237, 28, 36));
                 c.setCenterX(rectangle.getWidth() / 2);
                 c.setCenterY(rectangle.getHeight() / 2);
                 gridPane.add(c, i, 0);
             }
         }
-        for (int i = 1; i <= settings.getRows(); i++) {
-            for (int j = 0; j < settings.getColumns(); j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
                 Rectangle rectangle = new Rectangle();
                 rectangle.setWidth(20);
                 rectangle.setHeight(20);
                 rectangle.setFill(fieldcolor);
                 rectangle.setId(i + ";" + j);
-                gridPane.add(rectangle, i - 1, j);
-                Piece piece = board.lookUp(i - 1, j);
-                Circle c = new Circle(10, piece.getColour());
+                gridPane.add(rectangle, i, j);
+                Circle c = new Circle(10, Color.rgb(255, 255, 255));
                 c.setCenterX(rectangle.getWidth() / 2);
                 c.setCenterY(rectangle.getHeight() / 2);
                 gridPane.add(c, i, j);
@@ -127,7 +117,7 @@ public class GameController {
     private void send(ActionEvent event) throws InterruptedException {
         String message = gamemessage.getText();
         gamemessage.clear();
-        gameSpace.put(userName, message);
+        chat.put(userName, message);
     }
 
     @FXML
@@ -137,7 +127,13 @@ public class GameController {
 
     @FXML
     private void ready(ActionEvent event) {
-
+        try {
+            channel.put("status", userName, "ready");
+            readyBtn.setDisable(true);
+            run();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -150,7 +146,7 @@ public class GameController {
         alert.setContentText("Go to the lobby?");
         alert.setTitle("Gravitrips");
         if (alert.showAndWait().get() == ButtonType.OK) {
-            gameSpace.put(userName, "Left the game");
+            chat.put(userName, "Left the game");
             Client.startLobby(stage);
         } else {
             System.out.println("Cancel");

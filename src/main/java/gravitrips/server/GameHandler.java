@@ -1,12 +1,12 @@
 package gravitrips.server;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.ArrayList;
 import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.SequentialSpace;
 import org.jspace.SpaceRepository;
+
+import com.google.gson.Gson;
 
 import gravitrips.client.Settings;
 
@@ -14,37 +14,55 @@ class gameHandler implements Runnable {
     private SequentialSpace gameSpace;
     private String gameID;
     private String spaceID;
-    private Map<String, String> players = new HashMap<String, String>();
     private SequentialSpace playerOneChannel;
     private SequentialSpace playerTwoChannel;
+    private ArrayList<String> players = new ArrayList<String>();
+    private Game game;
+    private int rows;
+    private int columns;
+    private Gson gson = new Gson();
 
     public gameHandler(String gameID, String spaceID, String uri, SpaceRepository repository, Settings settings)
             throws InterruptedException {
         this.gameID = gameID;
         this.spaceID = spaceID;
+        this.rows = settings.getRows();
+        this.columns = settings.getColumns();
 
         gameSpace = new SequentialSpace();
         playerOneChannel = new SequentialSpace();
         playerTwoChannel = new SequentialSpace();
 
         repository.add(this.spaceID, gameSpace);
-        repository.add(this.gameID + "playerOne", playerOneChannel);
-        repository.add(this.gameID + "playerTwo", playerOneChannel);
+        repository.add(this.gameID + "player1", playerOneChannel);
+        repository.add(this.gameID + "player2", playerTwoChannel);
         new Thread(new ServerChatHandler(gameSpace)).start();
-        gameSpace.put("Server", "Welcome to " + gameID);
     }
 
     @Override
     public void run() {
         try {
-            for (int i = 0; i < 2; i++) {
-                Object[] joinMessage = gameSpace.get(new ActualField("joining"), new FormalField(String.class));
-                players.put((String) joinMessage[0], (String) joinMessage[1]);
-                // String playerURI = "tcp://" + host + ":" + port + "/game" + gameC + "?keep";
-                gameSpace.put("player" + (String) joinMessage[0], playerOneChannel);
-            }
             while (true) {
-
+                Object[] join1Message = gameSpace.get(new ActualField("channel"), new ActualField("request"),
+                        new FormalField(String.class));
+                System.out.println("Got one");
+                Object[] join2Message = gameSpace.get(new ActualField("channel"), new ActualField("request"),
+                        new FormalField(String.class));
+                System.out.println("Got Two");
+                gameSpace.put("channel", "response", (String) join1Message[2], this.gameID + "player1");
+                gameSpace.put("channel", "response", (String) join2Message[2], this.gameID + "player2");
+                System.out.println(join1Message[2] + " got channel " + this.gameID + "player1");
+                players.add((String) join1Message[2]);
+                System.out.println(join2Message[2] + " got channel " + this.gameID + "player2");
+                players.add((String) join2Message[2]);
+                game = new Game(rows, columns, players.get(0), players.get(1));
+                playerOneChannel.put("setup", rows, columns, 1);
+                playerTwoChannel.put("setup", rows, columns, 2);
+                System.out.println("Sent setup");
+                String board = gson.toJson(game.getBoard());
+                System.out.println(board);
+                playerOneChannel.put("board", board);
+                playerTwoChannel.put("board", board);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
