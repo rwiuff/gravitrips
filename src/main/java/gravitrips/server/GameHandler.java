@@ -90,8 +90,10 @@ class gameHandler implements Runnable {
             }
             playerOneChannel.put("break");
             playerTwoChannel.put("break");
-            playerOneChannel.put(game.getLastMove().getPiece());
-            playerTwoChannel.put(game.getLastMove().getPiece());
+            String winner = game.getLastMove().getPiece() == 1 ? players.get(0) : players.get(1);
+            String loser = game.getLastMove().getPiece() == 2 ? players.get(0) : players.get(1);
+            playerOneChannel.put(game.getLastMove().getPiece(), winner, loser);
+            playerTwoChannel.put(game.getLastMove().getPiece(), winner, loser);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

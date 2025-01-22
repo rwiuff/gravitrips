@@ -15,6 +15,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -27,9 +28,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
@@ -40,6 +42,8 @@ public class GameController {
     TextFlow messages;
     @FXML
     Label label = new Label();
+    @FXML
+    Rectangle rectangle;
     @FXML
     Button readyBtn;
     @FXML
@@ -60,6 +64,7 @@ public class GameController {
         this.userName = settings.getUserName();
         this.chat = new RemoteSpace(game_uri);
         Thread chatThread = new Thread(new ClientChatHandler(chat, messages));
+        rectangle.setVisible(false);
         label.setVisible(false);
         this.channel = new RemoteSpace(channelUri);
         this.channel.put(userName, "Joined the game");
@@ -111,13 +116,35 @@ public class GameController {
                                     while (true) {
                                         branch = (String) channel.get(new FormalField(String.class))[0];
                                         if (branch.equals("continue")) {
-                                            getInput();
+                                            final CountDownLatch latch1 = new CountDownLatch(1);
+                                            Platform.runLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        getInput();
+                                                    } finally {
+                                                        latch1.countDown();
+                                                    }
+                                                }
+                                            });
+                                            latch1.await();
                                         } else
                                             break;
                                     }
                                 }
-                                getBoard();
-                                drawBoard(false);
+                                final CountDownLatch latch = new CountDownLatch(1);
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            getBoard();
+                                            drawBoard(false);
+                                        } finally {
+                                            latch.countDown();
+                                        }
+                                    }
+                                });
+                                latch.await();
                             } else
                                 break;
                         }
@@ -152,10 +179,9 @@ public class GameController {
             item.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    System.out.println(event.getSource().getClass().getName());
                     Circle source = (Circle) event.getSource();
                     int input = GridPane.getColumnIndex(source);
-                    System.out.println("Click " + input);
+                    System.out.println("CLICK " + input);
                     try {
                         channel.put(input);
                     } catch (InterruptedException e) {
@@ -195,13 +221,16 @@ public class GameController {
     }
 
     private void winner() {
-    }
-
-    @FXML
-    private int onMouseClicked(MouseEvent event) {
-        Pane pane = (Pane) event.getSource();
-        System.out.println("CLICK: " + GridPane.getColumnIndex(pane));
-        return GridPane.getColumnIndex(pane);
+        try {
+            Object[] conclusion = channel.get(new FormalField(Integer.class), new FormalField(String.class), new FormalField(String.class));
+            rectangle.setVisible(true);
+            label.setVisible(true);
+            label.setText("Winner is " + conclusion[1]);
+            label.setFont(Font.font(18));
+            label.setAlignment(Pos.CENTER);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
