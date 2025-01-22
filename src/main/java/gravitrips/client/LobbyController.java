@@ -24,26 +24,18 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 public class LobbyController {
-
     @FXML
     TextField lobbymessage;
-
     @FXML
     TextFlow messages;
-
     @FXML
     TreeView<String> tree = new TreeView<>();
-
     private String host;
     private String port;
     private String userName;
-
     private RemoteSpace lobby;
-
     private RemoteSpace globalChat;
-
     private RemoteSpace game_space;
-
     private TreeItem<String> root;
 
     public void setup(Settings settings) throws InterruptedException {

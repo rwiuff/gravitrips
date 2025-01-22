@@ -3,7 +3,6 @@ package gravitrips.server;
 import java.util.ArrayList;
 
 public class Game {
-
     private Board board;
     private ArrayList<Move> moves = new ArrayList<Move>();
 

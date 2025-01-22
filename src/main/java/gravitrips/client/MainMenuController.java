@@ -24,10 +24,8 @@ import javafx.stage.Stage;
 public class MainMenuController {
     @FXML
     Button startBtn;
-
     @FXML
     Button settingsBtn;
-
     @FXML
     Button exitBtn;
 

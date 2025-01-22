@@ -35,9 +35,7 @@ public class Server implements Runnable {
     public void run() {
         while (true) {
             Integer gameC = 0;
-
             String gameURI;
-
             while (true) {
                 Object[] request;
                 try {
@@ -45,9 +43,7 @@ public class Server implements Runnable {
                             new FormalField(String.class));
                     String userName = (String) request[1];
                     String gameID = (String) request[2];
-
                     Object[] game = games.queryp(new ActualField(gameID), new FormalField(Integer.class));
-
                     if (game != null) {
                         gameURI = "tcp://" + host + ":" + port + "/game" + game[1] + "?keep";
                     } else {
