@@ -8,6 +8,7 @@ import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 import com.google.gson.Gson;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -49,11 +50,12 @@ public class GameController {
     private Color playerTwoColour = Color.rgb(147, 149, 152);
     private Color playerColour;
     protected Object source;
-    private Integer lastPane;
-    private boolean lock;
+    private Scene scene;
+    protected int input;
 
     public void setup(Settings settings, String channelUri, String game_uri, Scene scene)
             throws UnknownHostException, IOException, InterruptedException {
+        this.scene = scene;
         this.userName = settings.getUserName();
         this.chat = new RemoteSpace(game_uri);
         Thread chatThread = new Thread(new ClientChatHandler(chat, messages));
@@ -82,25 +84,27 @@ public class GameController {
     private void run() {
         try {
             while (true) {
+                System.out.println("Client: Waiting to start");
                 String begin = (String) channel.get(new ActualField("begin"))[0];
-                if (begin.equals("begin"))
+                if (begin.equals("begin")) {
+                    System.out.println("Client: Start");
                     break;
+                }
             }
             while (true) {
                 String branch = (String) channel.get(new FormalField(String.class))[0];
                 if (branch.equals("continue")) {
+                    System.out.println("Client: Continuing");
                     int turn = (int) channel.get(new ActualField("turn"), new FormalField(Integer.class))[1];
                     if (turn == player) {
+                        System.out.println("Client: My turn");
                         drawBoard(true);
-                        lock = true;
-                        channel.put(lastPane);
-                        lock = false;
+                        channel.put(getInput());
+                        System.out.print("Afterclick");
                         while (true) {
                             branch = (String) channel.get(new FormalField(String.class))[0];
                             if (branch.equals("continue")) {
-                                lock = true;
-                                channel.put(lastPane);
-                                lock = false;
+                                channel.put(getInput());
                             } else
                                 break;
                         }
@@ -115,6 +119,17 @@ public class GameController {
             e.printStackTrace();
         }
 
+    }
+
+    private int getInput() {
+        scene.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                input = onMouseClicked(event);
+                event.consume();
+            }
+        });
+        return input;
     }
 
     private void drawBoard(boolean b) {
@@ -149,12 +164,10 @@ public class GameController {
     }
 
     @FXML
-    private void onMouseClicked(MouseEvent event) {
-        if (lock) {
-            Pane pane = (Pane) event.getSource();
-            System.out.println("CLICK: " + GridPane.getColumnIndex(pane));
-            lastPane = GridPane.getColumnIndex(pane);
-        }
+    private int onMouseClicked(MouseEvent event) {
+        Pane pane = (Pane) event.getSource();
+        System.out.println("CLICK: " + GridPane.getColumnIndex(pane));
+        return GridPane.getColumnIndex(pane);
     }
 
     @FXML

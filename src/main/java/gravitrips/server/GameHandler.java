@@ -55,7 +55,9 @@ class gameHandler implements Runnable {
             playerTwoChannel.put("setup", rows, columns, 2);
             sendBoard();
             playerOneChannel.get(new ActualField("status"), new ActualField(players.get(0)), new ActualField("ready"));
+            System.out.println("Server: One ready");
             playerTwoChannel.get(new ActualField("status"), new ActualField(players.get(1)), new ActualField("ready"));
+            System.out.println("Server: Two ready");
             gameSpace.put("server", players.get(0) + " starts");
             playerOneChannel.put("begin");
             playerTwoChannel.put("begin");
