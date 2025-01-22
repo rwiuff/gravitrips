@@ -45,25 +45,27 @@ class gameHandler implements Runnable {
             while (true) {
                 Object[] join1Message = gameSpace.get(new ActualField("channel"), new ActualField("request"),
                         new FormalField(String.class));
-                System.out.println("Got one");
                 Object[] join2Message = gameSpace.get(new ActualField("channel"), new ActualField("request"),
                         new FormalField(String.class));
-                System.out.println("Got Two");
                 gameSpace.put("channel", "response", (String) join1Message[2], this.gameID + "player1");
                 gameSpace.put("channel", "response", (String) join2Message[2], this.gameID + "player2");
-                System.out.println(join1Message[2] + " got channel " + this.gameID + "player1");
                 players.add((String) join1Message[2]);
-                System.out.println(join2Message[2] + " got channel " + this.gameID + "player2");
                 players.add((String) join2Message[2]);
                 game = new Game(rows, columns, players.get(0), players.get(1));
                 playerOneChannel.put("setup", rows, columns, 1);
                 playerTwoChannel.put("setup", rows, columns, 2);
-                System.out.println("Sent setup");
-                String board = gson.toJson(game.getBoard());
-                System.out.println(board);
-                playerOneChannel.put("board", board);
-                playerTwoChannel.put("board", board);
+                sendBoard();
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendBoard() {
+        String send = gson.toJson(game.getBoard());
+        try {
+            playerOneChannel.put("board", send);
+            playerTwoChannel.put("board", send);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

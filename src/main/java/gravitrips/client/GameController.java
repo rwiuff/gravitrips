@@ -8,8 +8,6 @@ import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -17,10 +15,12 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -47,6 +47,11 @@ public class GameController {
     private int rows;
     private int columns;
     private int player;
+    private Color fieldColour = Color.rgb(237, 28, 36);
+    private Color playerOneColour = Color.rgb(255, 255, 255);
+    private Color playerTwoColour = Color.rgb(147, 149, 152);
+    private Color playerColour;
+    private int size = 20;
 
     public void setup(Settings settings, String channelUri, String game_uri)
             throws UnknownHostException, IOException, InterruptedException {
@@ -62,55 +67,77 @@ public class GameController {
         this.rows = (int) serverSettings[1];
         this.columns = (int) serverSettings[2];
         this.player = (int) serverSettings[3];
-        String getBoard = (String) channel.get(new ActualField("board"), new FormalField(String.class))[1];
-        this.board = gson.fromJson(getBoard, int[][].class);
+        playerColour = (player == 1) ? playerOneColour : playerTwoColour;
+        getBoard();
         drawBoard();
+    }
+
+    private void getBoard() {
+        try {
+            String fetch = (String) channel.get(new ActualField("board"), new FormalField(String.class))[1];
+            this.board = gson.fromJson(fetch, int[][].class);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void run() {
         // try {
-        // // while (true) {
-
-        // // }
+        //     while (true) {
+                
+        //     }
         // } catch (InterruptedException e) {
-        // e.printStackTrace();
+        //     e.printStackTrace();
         // }
     }
 
     private void drawBoard() {
         GridPane gridPane = new GridPane();
-        Color fieldcolor = Color.rgb(237, 28, 36);
         for (int i = 0; i < columns; i++) {
             Rectangle rectangle = new Rectangle();
-            rectangle.setWidth(20);
-            rectangle.setHeight(20);
-            rectangle.setFill(fieldcolor);
+            rectangle.setWidth(size);
+            rectangle.setHeight(size);
+            rectangle.setFill(fieldColour);
             rectangle.setId(i + ";" + 0);
             gridPane.add(rectangle, i, 0);
             if (board[0][i] == 0) {
-                Circle c = new Circle(10, Color.rgb(237, 28, 36));
+                Circle c = new Circle(10, playerColour);
+                c.setOpacity(.7);
                 c.setCenterX(rectangle.getWidth() / 2);
                 c.setCenterY(rectangle.getHeight() / 2);
                 gridPane.add(c, i, 0);
             }
         }
-        for (int i = 0; i < rows; i++) {
+        for (int i = 1; i <= rows; i++) {
             for (int j = 0; j < columns; j++) {
                 Rectangle rectangle = new Rectangle();
                 rectangle.setWidth(20);
                 rectangle.setHeight(20);
-                rectangle.setFill(fieldcolor);
-                rectangle.setId(i + ";" + j);
-                gridPane.add(rectangle, i, j);
-                Circle c = new Circle(10, Color.rgb(255, 255, 255));
+                rectangle.setFill(fieldColour);
+                rectangle.setId(j + ";" + i);
+                gridPane.add(rectangle, j, i);
+                Circle c;
+                if (board[i - 1][j] == 1) {
+                    c = new Circle(size / 2, playerOneColour);
+                } else if (board[i - 1][j] == 2) {
+                    c = new Circle(size / 2, playerTwoColour);
+                } else {
+                    c = new Circle(size / 2, fieldColour);
+                }
                 c.setCenterX(rectangle.getWidth() / 2);
                 c.setCenterY(rectangle.getHeight() / 2);
-                gridPane.add(c, i, j);
+                gridPane.add(c, j, i);
             }
         }
         gridPane.setAlignment(Pos.CENTER);
         gameField.getChildren().add(gridPane);
         StackPane.setAlignment(gridPane, Pos.CENTER);
+    }
+
+    @FXML
+    private void onPaneClicked(MouseEvent event) {
+        Pane pane = (Pane) event.getSource();
+        System.out.println(GridPane.getColumnIndex(pane));
     }
 
     @FXML
@@ -130,6 +157,7 @@ public class GameController {
         try {
             channel.put("status", userName, "ready");
             readyBtn.setDisable(true);
+            readyBtn.setOpacity(.7);
             run();
         } catch (InterruptedException e) {
             e.printStackTrace();

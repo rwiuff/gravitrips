@@ -3,8 +3,6 @@ package gravitrips.client;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.jspace.RemoteSpace;
-
 import gravitrips.server.Server;
 import javafx.application.Application;
 import javafx.application.Platform;

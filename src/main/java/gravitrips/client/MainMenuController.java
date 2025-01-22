@@ -76,9 +76,9 @@ public class MainMenuController {
         grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField rows = new TextField();
-        rows.setPromptText("16");
+        rows.setPromptText("6");
         TextField columns = new TextField();
-        columns.setPromptText("16");
+        columns.setPromptText("7");
         TextField host = new TextField();
         host.setPromptText("localhost");
         TextField port = new TextField();
