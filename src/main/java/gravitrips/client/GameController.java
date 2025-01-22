@@ -44,18 +44,14 @@ public class GameController {
     private RemoteSpace channel;
     private RemoteSpace chat;
     private Gson gson = new Gson();
-    private int rows;
-    private int columns;
     private int player;
     private Color fieldColour = Color.rgb(237, 28, 36);
     private Color playerOneColour = Color.rgb(255, 255, 255);
     private Color playerTwoColour = Color.rgb(147, 149, 152);
     private Color playerColour;
-    private Scene scene;
 
     public void setup(Settings settings, String channelUri, String game_uri, Scene scene)
             throws UnknownHostException, IOException, InterruptedException {
-        this.scene = scene;
         this.userName = settings.getUserName();
         this.chat = new RemoteSpace(game_uri);
         Thread chatThread = new Thread(new ClientChatHandler(chat, messages));
@@ -63,11 +59,8 @@ public class GameController {
         this.channel = new RemoteSpace(channelUri);
         this.channel.put(userName, "Joined the game");
         chatThread.start();
-        Object[] serverSettings = channel.get(new ActualField("setup"), new FormalField(Integer.class),
-                new FormalField(Integer.class), new FormalField(Integer.class));
-        this.rows = (int) serverSettings[1];
-        this.columns = (int) serverSettings[2];
-        this.player = (int) serverSettings[3];
+        Object[] serverSettings = channel.get(new ActualField("setup"), new FormalField(Integer.class));
+        this.player = (int) serverSettings[1];
         playerColour = (player == 1) ? playerOneColour : playerTwoColour;
         getBoard();
     }
@@ -127,13 +120,14 @@ public class GameController {
             public void handle(MouseEvent event) {
                 Object source = event.getSource();
                 int input = GridPane.getColumnIndex((Pane) source);
+                System.out.println("Click " + input);
                 try {
                     channel.put(input);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            
+
         });
         return 1;
     }
@@ -185,7 +179,8 @@ public class GameController {
 
     @FXML
     private void onEnter(KeyEvent event) throws InterruptedException {
-        if(event.getCode().equals(KeyCode.ENTER)) send(new ActionEvent());
+        if (event.getCode().equals(KeyCode.ENTER))
+            send(new ActionEvent());
     }
 
     @FXML

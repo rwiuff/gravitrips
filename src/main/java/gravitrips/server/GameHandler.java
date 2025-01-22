@@ -51,8 +51,8 @@ class gameHandler implements Runnable {
             players.add((String) join1Message[2]);
             players.add((String) join2Message[2]);
             game = new Game(rows, columns);
-            playerOneChannel.put("setup", rows, columns, 1);
-            playerTwoChannel.put("setup", rows, columns, 2);
+            playerOneChannel.put("setup", 1);
+            playerTwoChannel.put("setup", 2);
             sendBoard();
             playerOneChannel.get(new ActualField("status"), new ActualField(players.get(0)), new ActualField("ready"));
             System.out.println("Server: One ready");

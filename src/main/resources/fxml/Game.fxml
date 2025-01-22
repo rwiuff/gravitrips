@@ -71,7 +71,7 @@
       </VBox>
       <StackPane>
          <children>
-            <GridPane fx:id="gridPane" alignment="CENTER" gridLinesVisible="true" prefHeight="400.0" prefWidth="400.0" style="-fx-background-color: #ed1c24; -fx-border-color: #c60909;">
+            <GridPane fx:id="gridPane" alignment="CENTER" prefHeight="400.0" prefWidth="400.0" style="-fx-background-color: #ed1c24; -fx-border-color: #c60909;">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
