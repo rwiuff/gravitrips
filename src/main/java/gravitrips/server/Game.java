@@ -7,8 +7,9 @@ public class Game {
     private Board board;
     private ArrayList<Move> moves = new ArrayList<Move>();
 
-    public Game(int rows, int columns, String playerOne, String playerTwo) {
+    public Game(int rows, int columns) {
         this.board = new Board(rows, columns);
+        moves.add(new Move(1, 0, 0));
     }
 
     public int[][] getBoard() {

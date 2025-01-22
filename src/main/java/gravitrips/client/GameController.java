@@ -6,12 +6,11 @@ import java.net.UnknownHostException;
 import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
-
 import com.google.gson.Gson;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
@@ -21,10 +20,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
@@ -34,11 +31,11 @@ public class GameController {
     @FXML
     TextFlow messages;
     @FXML
-    StackPane gameField = new StackPane();
-    @FXML
     Label label = new Label();
     @FXML
     Button readyBtn;
+    @FXML
+    GridPane gridPane = new GridPane();
     private int[][] board;
     private String userName;
     private RemoteSpace channel;
@@ -51,9 +48,11 @@ public class GameController {
     private Color playerOneColour = Color.rgb(255, 255, 255);
     private Color playerTwoColour = Color.rgb(147, 149, 152);
     private Color playerColour;
-    private int size = 20;
+    protected Object source;
+    private Integer lastPane;
+    private boolean lock;
 
-    public void setup(Settings settings, String channelUri, String game_uri)
+    public void setup(Settings settings, String channelUri, String game_uri, Scene scene)
             throws UnknownHostException, IOException, InterruptedException {
         this.userName = settings.getUserName();
         this.chat = new RemoteSpace(game_uri);
@@ -69,7 +68,6 @@ public class GameController {
         this.player = (int) serverSettings[3];
         playerColour = (player == 1) ? playerOneColour : playerTwoColour;
         getBoard();
-        drawBoard();
     }
 
     private void getBoard() {
@@ -84,67 +82,79 @@ public class GameController {
     private void run() {
         try {
             while (true) {
-                Object[] status = channel.get(new ActualField("status"), new FormalField(String.class));
-                if (status[1].equals("turn")) {
-                    channel.put(move());
-                } else if (status[1].equals("invalid")) {
-                    channel.put(move());
-                } else if (status[1].equals("winner")) {
-                    int winner = (int) channel.get(new ActualField("winner"), new FormalField(Integer.class))[1];
-                }
+                String begin = (String) channel.get(new ActualField("begin"))[0];
+                if (begin.equals("begin"))
+                    break;
             }
+            while (true) {
+                String branch = (String) channel.get(new FormalField(String.class))[0];
+                if (branch.equals("continue")) {
+                    int turn = (int) channel.get(new ActualField("turn"), new FormalField(Integer.class))[1];
+                    if (turn == player) {
+                        drawBoard(true);
+                        lock = true;
+                        channel.put(lastPane);
+                        lock = false;
+                        while (true) {
+                            branch = (String) channel.get(new FormalField(String.class))[0];
+                            if (branch.equals("continue")) {
+                                lock = true;
+                                channel.put(lastPane);
+                                lock = false;
+                            } else
+                                break;
+                        }
+                    }
+                    getBoard();
+                    drawBoard(false);
+                } else
+                    break;
+            }
+            winner();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
     }
 
-    private void drawBoard() {
-        GridPane gridPane = new GridPane();
-        for (int i = 0; i < columns; i++) {
-            Rectangle rectangle = new Rectangle();
-            rectangle.setWidth(size);
-            rectangle.setHeight(size);
-            rectangle.setFill(fieldColour);
-            rectangle.setId(i + ";" + 0);
-            gridPane.add(rectangle, i, 0);
-            if (board[0][i] == 0) {
-                Circle c = new Circle(10, playerColour);
-                c.setOpacity(.7);
-                c.setCenterX(rectangle.getWidth() / 2);
-                c.setCenterY(rectangle.getHeight() / 2);
-                gridPane.add(c, i, 0);
+    private void drawBoard(boolean b) {
+        if (b) {
+            for (int i = 0; i < 7; i++) {
+                if (board[0][i] == 0) {
+                    Circle c = new Circle(57 / 2, playerColour);
+                    c.setStroke(Color.rgb(50, 50, 50));
+                    c.setOpacity(.7);
+                    gridPane.add(c, i, 0);
+                }
             }
         }
-        for (int i = 1; i <= rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                Rectangle rectangle = new Rectangle();
-                rectangle.setWidth(20);
-                rectangle.setHeight(20);
-                rectangle.setFill(fieldColour);
-                rectangle.setId(j + ";" + i);
-                gridPane.add(rectangle, j, i);
+        for (int i = 1; i <= 6; i++) {
+            for (int j = 0; j < 7; j++) {
                 Circle c;
                 if (board[i - 1][j] == 1) {
-                    c = new Circle(size / 2, playerOneColour);
+                    c = new Circle(57 / 2, playerOneColour);
+                    c.setStroke(Color.rgb(50, 50, 50));
                 } else if (board[i - 1][j] == 2) {
-                    c = new Circle(size / 2, playerTwoColour);
+                    c = new Circle(57 / 2, playerTwoColour);
+                    c.setStroke(Color.rgb(50, 50, 50));
                 } else {
-                    c = new Circle(size / 2, fieldColour);
+                    c = new Circle(57 / 2, fieldColour);
                 }
-                c.setCenterX(rectangle.getWidth() / 2);
-                c.setCenterY(rectangle.getHeight() / 2);
                 gridPane.add(c, j, i);
             }
         }
-        gridPane.setAlignment(Pos.CENTER);
-        gameField.getChildren().add(gridPane);
-        StackPane.setAlignment(gridPane, Pos.CENTER);
+    }
+
+    private void winner() {
     }
 
     @FXML
-    private void onPaneClicked(MouseEvent event) {
-        Pane pane = (Pane) event.getSource();
-        System.out.println(GridPane.getColumnIndex(pane));
+    private void onMouseClicked(MouseEvent event) {
+        if (lock) {
+            Pane pane = (Pane) event.getSource();
+            System.out.println("CLICK: " + GridPane.getColumnIndex(pane));
+            lastPane = GridPane.getColumnIndex(pane);
+        }
     }
 
     @FXML

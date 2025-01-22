@@ -50,41 +50,46 @@ class gameHandler implements Runnable {
             gameSpace.put("channel", "response", (String) join2Message[2], this.gameID + "player2");
             players.add((String) join1Message[2]);
             players.add((String) join2Message[2]);
-            game = new Game(rows, columns, players.get(0), players.get(1));
+            game = new Game(rows, columns);
             playerOneChannel.put("setup", rows, columns, 1);
             playerTwoChannel.put("setup", rows, columns, 2);
             sendBoard();
-            while (true) {
-                playerOneChannel.get(new ActualField("status"), new ActualField(players.get(0)),
-                        new ActualField("ready"));
-                playerTwoChannel.get(new ActualField("status"), new ActualField(players.get(1)),
-                        new ActualField("ready"));
-                int playerTurn = 1;
-                while (game.checkState() == false) {
-                    if (checkplayerTurn(playerTurn) == 1) {
-                        playerOneChannel.put("status", "turn");
-                        playerTwoChannel.put("status", "wait");
-                        int column = (int) playerOneChannel.get(new FormalField(Integer.class))[0];
-                        while (validMove(playerTurn % 2, column) == false) {
-                            playerOneChannel.put("status", "invalid");
-                            column = (int) playerOneChannel.get(new FormalField(Integer.class))[0];
-                        }
-                    } else if (checkplayerTurn(playerTurn) == 0) {
-                        playerOneChannel.put("status", "wait");
-                        playerTwoChannel.put("status", "turn");
-                        int column = (int) playerTwoChannel.get(new FormalField(Integer.class))[0];
-                        while (validMove(playerTurn % 2, column) == false) {
-                            playerTwoChannel.put("status", "invalid");
-                            column = (int) playerTwoChannel.get(new FormalField(Integer.class))[0];
-                        }
+            playerOneChannel.get(new ActualField("status"), new ActualField(players.get(0)), new ActualField("ready"));
+            playerTwoChannel.get(new ActualField("status"), new ActualField(players.get(1)), new ActualField("ready"));
+            gameSpace.put("server", players.get(0) + " starts");
+            playerOneChannel.put("begin");
+            playerTwoChannel.put("begin");
+            int playerTurn = 1;
+            while (game.checkState() == false) {
+                playerOneChannel.put("continue");
+                playerTwoChannel.put("continue");
+                if (checkPlayerTurn(playerTurn)) {
+                    playerOneChannel.put("turn", 1);
+                    playerTwoChannel.put("turn", 1);
+                    int column = (int) playerOneChannel.get(new FormalField(Integer.class))[0];
+                    while (validMove(1, column) == false) {
+                        playerOneChannel.put("continue");
+                        column = (int) playerOneChannel.get(new FormalField(Integer.class))[0];
                     }
-                    sendBoard();
+                    playerOneChannel.put("break");
+                } else {
+                    playerOneChannel.put("turn", 2);
+                    playerTwoChannel.put("turn", 2);
+                    int column = (int) playerTwoChannel.get(new FormalField(Integer.class))[0];
+                    while (validMove(2, column) == false) {
+                        playerTwoChannel.put("continue");
+                        column = (int) playerTwoChannel.get(new FormalField(Integer.class))[0];
+                    }
+                    playerTwoChannel.put("break");
                 }
-                playerOneChannel.put("status", "winner");
-                playerOneChannel.put("winner", game.getLastMove().getPiece());
-                playerTwoChannel.put("status", "winner");
-                playerTwoChannel.put("winner", game.getLastMove().getPiece());
+                sendBoard();
+                playerTurn++;
+                gameSpace.put("server", players.get(playerTurn % 2) + "'s turn");
             }
+            playerOneChannel.put("break");
+            playerTwoChannel.put("break");
+            playerOneChannel.put(game.getLastMove().getPiece());
+            playerTwoChannel.put(game.getLastMove().getPiece());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -100,8 +105,8 @@ class gameHandler implements Runnable {
         }
     }
 
-    private int checkplayerTurn(int playerTurn) {
-        return playerTurn % 2;
+    private boolean checkPlayerTurn(int playerTurn) {
+        return playerTurn % 2 == 1;
     }
 
     private void sendBoard() {
