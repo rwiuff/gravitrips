@@ -96,7 +96,9 @@ public class LobbyController {
                 new FormalField(String.class));
         for (Object[] entry : games) {
             userList.put((String) entry[1], (String) entry[2]);
-            gameList.add((String) entry[2]);
+            if (gameList.contains((String) entry[2]) == false) {
+                gameList.add((String) entry[2]);
+            }
         }
         for (String game : gameList) {
             TreeItem<String> aGame = new TreeItem<String>(game);

@@ -85,8 +85,8 @@ class gameHandler implements Runnable {
                     playerTwoChannel.put("break");
                 }
                 sendBoard();
-                playerTurn++;
                 gameSpace.put("server", players.get(playerTurn % 2) + "'s turn");
+                playerTurn++;
             }
             playerOneChannel.put("break");
             playerTwoChannel.put("break");
